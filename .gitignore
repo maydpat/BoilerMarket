@@ -1,2 +1,3 @@
 # Don't track content of these folders
 BoilerMarket/node_modules/
+BoilerMarket/package-lock.json

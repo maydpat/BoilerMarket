@@ -1,0 +1,79 @@
+{{> header}}
+<div class="m-grid__item m-grid__item--fluid m-wrapper">
+
+	<div class="m-content">
+		{{#if error}}
+		<div class="alert alert-danger alert-dismissible fade show" role="alert">
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+			</button>
+			<strong>Oh snap!</strong> {{error}}
+		</div>
+		{{/if}}
+		{{#if success}}
+		<div class="alert alert-success alert-dismissible fade show" role="alert">
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+			</button>
+			<strong>Success!</strong> {{success}}
+		</div>
+		{{/if}}
+
+		<div class="row">
+            <div class="col-lg-6">
+
+                <!--begin::Portlet-->
+                <div class="m-portlet">
+                    <div class="m-portlet__head">
+                        <div class="m-portlet__head-caption">
+                            <div class="m-portlet__head-title">
+                                <span class="m-portlet__head-icon m--hide">
+                                    <i class="la la-gear"></i>
+                                </span>
+                                <h3 class="m-portlet__head-text">
+                                    BoilerMarket Profile
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--begin::Form-->
+                    <form class="m-form" action="/profile/update-profile" method="post">
+                        <div class="m-portlet__body">
+                            <div class="m-form__section m-form__section--first">
+                                <div class="form-group m-form__group">
+                                    <label for="example_input_full_name">Name:</label>
+                                    <input type="text" class="form-control m-input" disabled="" value="{{user_first_name}} {{user_last_name}}">
+                                </div>
+                                <div class="form-group m-form__group">
+                                    <label for="example_input_full_name">Email:</label>
+                                    <input type="email" name="email" class="form-control m-input" required="" maxlength="240" value="{{user_email}}">
+                                </div>
+                                <div class="form-group m-form__group">
+                                    <label for="example_input_full_name">Phone Number:</label>
+                                    <input type="text" name="phone_number" class="form-control m-input" required="" maxlength="12" value="{{user_phone_number}}">
+                                </div>
+                                <div class="form-group m-form__group">
+                                    <label for="example_input_full_name">Location (ZIP):</label>
+                                    <input type="number" name="location" class="form-control m-input" required="" maxlength="12" value="{{user_location}}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="m-portlet__foot m-portlet__foot--fit">
+                            <div class="m-form__actions m-form__actions">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                                <button type="reset" class="btn btn-secondary">Cancel</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!--end::Form-->
+                </div>
+
+                <!--end::Portlet-->
+            </div>
+        </div>
+
+		<!--End::Main Portlet-->
+	</div>
+</div>
+
+{{> footer}}

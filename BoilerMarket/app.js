@@ -19,11 +19,19 @@ const port = 80;
 
 app.engine('.hbs', exphbs({
   extname: 'hbs',
-  layoutsDir: path.join(__dirname, 'views/layouts'),
+  defaultLayout: null,
   partialsDir: path.join(__dirname, 'views/partials'),
 }));
 app.set('view engine', '.hbs');
 app.set('views', path.join(__dirname, 'views'));
+
+//Load Page Routes
+const indexRoute = require('./routes/index');
+const loginRoute = require('./routes/login');
+const registerRoute = require('./routes/register');
+const logoutRoute = require('./routes/logout');
+const dashboardRoute = require('./routes/dashboard');
+const profileRoute = require('./routes/profile');
 
 // Static folder
 app.use(express.static(path.join(__dirname, '/public')));
@@ -42,6 +50,14 @@ app.use(expressValidator());
 // Passport init
 app.use(passport.initialize());
 app.use(passport.session());
+
+// Use routes
+app.use('/', indexRoute);
+app.use('/', loginRoute);
+app.use('/', registerRoute);
+app.use('/', logoutRoute);
+app.use('/', dashboardRoute);
+app.use('/', profileRoute);
 
 app.listen(port, () =>{
   console.log(`Server started on port ${port}`);
