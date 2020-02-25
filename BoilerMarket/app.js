@@ -32,6 +32,7 @@ const registerRoute = require('./routes/register');
 const logoutRoute = require('./routes/logout');
 const dashboardRoute = require('./routes/dashboard');
 const profileRoute = require('./routes/profile');
+const listingsRoute = require('./routes/listings');
 
 // Static folder
 app.use(express.static(path.join(__dirname, '/public')));
@@ -58,6 +59,7 @@ app.use('/', registerRoute);
 app.use('/', logoutRoute);
 app.use('/', dashboardRoute);
 app.use('/', profileRoute);
+app.use('/', listingsRoute);
 
 app.listen(port, () =>{
   console.log(`Server started on port ${port}`);
