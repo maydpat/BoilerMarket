@@ -36,6 +36,7 @@
                     </div>
 
                     <!--begin::Form-->
+                    
                     <form class="m-form" action="/profile/update-profile" method="post">
                         <div class="m-portlet__body">
                             <div class="m-form__section m-form__section--first">
@@ -60,6 +61,55 @@
                         <div class="m-portlet__foot m-portlet__foot--fit">
                             <div class="m-form__actions m-form__actions">
                                 <button type="submit" class="btn btn-primary">Submit</button>
+                                <button type="reset" class="btn btn-secondary">Cancel</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!--end::Form-->
+                </div>
+
+                <!--end::Portlet-->
+            </div>
+            <div class="col-lg-6">
+
+                <!--begin::Portlet-->
+                <div class="m-portlet">
+                    <div class="m-portlet__head">
+                        <div class="m-portlet__head-caption">
+                            <div class="m-portlet__head-title">
+                                <span class="m-portlet__head-icon m--hide">
+                                    <i class="la la-gear"></i>
+                                </span>
+                                <h3 class="m-portlet__head-text">
+                                    BoilerMarket Profile
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--begin::Form-->
+
+                    <form class="m-form" action="/profile/change-password" method="post">
+                        <div class="m-portlet__body">
+                            <div class="m-form__section m-form__section--first">
+                                <div class="form-group m-form__group">
+                                    <label>Old Password</label>
+                                    <input type="password" name="old_password" class="form-control m-input" required="" maxlength="240">
+                                </div>
+                                <div class="form-group m-form__group">
+                                    <label>New Password</label>
+                                    <input type="password" name="new_password" class="form-control m-input" required="" maxlength="240">
+                                </div>
+                                <div class="form-group m-form__group">
+                                    <label>Confirm New Password</label>
+                                    <input type="password" name="confirm_password" class="form-control m-input" required="" maxlength="240">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="m-portlet__foot m-portlet__foot--fit">
+                            <div class="m-form__actions m-form__actions">
+                                <button type="submit" class="btn btn-primary">Change Password</button>
                                 <button type="reset" class="btn btn-secondary">Cancel</button>
                             </div>
                         </div>
