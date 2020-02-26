@@ -99,7 +99,17 @@ router.get(`/cart/add/:id`, AuthenticationFunctions.ensureAuthenticated, (req, r
 });
 
 router.get(`/cart/remove/:id`, AuthenticationFunctions.ensureAuthenticated, (req, res) => {
-
+  let con = mysql.createConnection(dbInfo);
+  con.query(`DELETE FROM cart WHERE buyer=${mysql.escape(req.user.id)} AND listing_id=${mysql.escape(req.params.id)};`, (errorRemovingListing, results, fields) => {
+    if (errorRemovingListing) {
+      console.log(errorRemovingListing);
+      con.end();
+      req.flash('error', 'Error.');
+      return res.redirect('/cart');
+    }
+    con.end();
+    return res.redirect('/cart');
+  });
 });
 
 module.exports = router;
