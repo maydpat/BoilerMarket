@@ -91,12 +91,26 @@ router.post('/listings/create-listing', AuthenticationFunctions.ensureAuthentica
       return res.redirect('/listings');
   }
   let con = mysql.createConnection(dbInfo);
-  con.query(`INSERT INTO listings (id, title, description, price, listing_type, listing_owner) VALUES (${mysql.escape(uuidv4())}, ${mysql.escape(req.body.listing_title)}, ${mysql.escape(req.body.listing_description)}, ${mysql.escape(Number(req.body.listing_price))}, ${mysql.escape(Number(req.body.listing_type))}, ${mysql.escape(req.user.id)});`, (insertListingError, insertListingResult, fields) => {
+  let newID = uuidv4();
+  con.query(`INSERT INTO listings (id, title, description, price, listing_type, listing_owner) VALUES (${mysql.escape(newID)}, ${mysql.escape(req.body.listing_title)}, ${mysql.escape(req.body.listing_description)}, ${mysql.escape(Number(req.body.listing_price))}, ${mysql.escape(Number(req.body.listing_type))}, ${mysql.escape(req.user.id)});`, (insertListingError, insertListingResult, fields) => {
     if (insertListingError) {
       console.log(insertListingError);
       con.end();
       req.flash('error', 'Error creating listing.');
       return res.redirect('/listings/create-listing');
+    }
+    if (req.body.listing_type == 2) {
+      con.query(`UPDATE listings SET duration=${mysql.escape(req.body.duration)} WHERE id=${mysql.escape(newID)};`, (setListingDurationError, setDurationResult, fields) => {
+        if (setListingDurationError) {
+          console.log(setListingDurationError);
+          con.end();
+          req.flash('error', 'Error setting rental duration.');
+          return res.redirect('/listings/create-listing');
+        }
+        con.end();
+        req.flash('success', 'Successfully created listing.');
+        return res.redirect('/listings/my-listings');
+      });
     }
     con.end();
     req.flash('success', 'Successfully created listing.');
