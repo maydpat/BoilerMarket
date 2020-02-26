@@ -2,7 +2,7 @@
 <div class="m-grid__item m-grid__item--fluid m-wrapper">
 
   <div class="m-content">
-    {{#if error}}
+      {{#if error}}
 		<div class="alert alert-danger alert-dismissible fade show" role="alert">
 			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
 			</button>
@@ -22,7 +22,7 @@
         <div class="m-portlet__head-caption">
           <div class="m-portlet__head-title">
             <h3 class="m-portlet__head-text">
-              Product Listings
+              My Product Listings
             </h3>
           </div>
         </div>
@@ -114,24 +114,17 @@
             </tr>
           </thead>
           <tbody>
+            {{#each userListings}}
             <tr>
-              <td>746 Pine View Junction</td>
-              <td>Nixie Sailor</td>
-              <td>Gleichner, Ziemann and Gutkowski</td>
-              <td>2/12/2018</td>
+              <td>{{this.title}}</td>
+              <td>{{this.description}}</td>
+              <td>{{this.price}}</td>
+              <td>{{this.listing_date}}</td>
               <td>3</td>
-              <td>2</td>
+              <td>{{this.listing_type}}</td>
               <td nowrap></td>
             </tr>
-            <tr>
-              <td>212 W Congress Ave</td>
-              <td>John Doe</td>
-              <td>People</td>
-              <td>4/1/2014</td>
-              <td>3</td>
-              <td>2</td>
-              <td nowrap></td>
-            </tr>
+            {{/each}}
           </tbody>
         </table>
       </div>

@@ -30,10 +30,23 @@ let dbInfo = {
 };
 
 router.get('/listings', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
-  return res.render('platform/listings.hbs', {
-    error: req.flash('error'),
-    success: req.flash('success'),
-    page_name: 'BoilerMarket Listings'
+  let con = mysql.createConnection(dbInfo);
+  con.query(`SELECT * FROM users WHERE id=${mysql.escape(req.user.id)};`, (findCurrentUserError, currentUser, fields) => {
+    if (findCurrentUserError) {
+      console.log(findCurrentUserError);
+      con.end();
+      req.flash('error', 'Error.');
+      return res.redirect('/dashboard');
+    }
+    con.end();
+    return res.render('platform/listings.hbs', {
+      page_name: 'BoilerMarket Listings',
+      error: req.flash('error'),
+      success: req.flash('success'),
+      user_first_name: currentUser[0].first_name,
+      user_last_name: currentUser[0].last_name,
+      user_email: currentUser[0].email,
+    });
   });
 });
 
@@ -52,6 +65,62 @@ router.get('/listings/create-listing', AuthenticationFunctions.ensureAuthenticat
       user_first_name: currentUser[0].first_name,
       user_last_name: currentUser[0].last_name,
       user_email: currentUser[0].email,
+      error: req.flash('error'),
+      success: req.flash('success'),
+    });
+  });
+});
+
+router.post('/listings/create-listing', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+  req.checkBody('listing_title', 'Title field is required.').notEmpty();
+  req.checkBody('listing_description', 'Description field is required.').notEmpty();
+  req.checkBody('listing_price', 'Price field is required.').notEmpty();
+  req.checkBody('listing_type', 'Listing Type field is required.').notEmpty();
+  let formErrors = req.validationErrors();
+  if (formErrors) {
+      req.flash('error', formErrors[0].msg);
+      return res.redirect('/listings');
+  }
+  let con = mysql.createConnection(dbInfo);
+  con.query(`INSERT INTO listings (id, title, description, price, listing_type, listing_owner) VALUES (${mysql.escape(uuidv4())}, ${mysql.escape(req.body.listing_title)}, ${mysql.escape(req.body.listing_description)}, ${mysql.escape(Number(req.body.listing_price))}, ${mysql.escape(Number(req.body.listing_type))}, ${mysql.escape(req.user.id)});`, (insertListingError, insertListingResult, fields) => {
+    if (insertListingError) {
+      console.log(insertListingError);
+      con.end();
+      req.flash('error', 'Error creating listing.');
+      return res.redirect('/listings/create-listing');
+    }
+    con.end();
+    req.flash('success', 'Successfully created listing.');
+    return res.redirect('/listings/my-listings');
+  });
+});
+
+router.get('/listings/my-listings', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+  let con = mysql.createConnection(dbInfo);
+  con.query(`SELECT * FROM users WHERE id=${mysql.escape(req.user.id)};`, (findCurrentUserError, currentUser, fields) => {
+    if (findCurrentUserError) {
+      console.log(findCurrentUserError);
+      con.end();
+      req.flash('error', 'Error.');
+      return res.redirect('/dashboard');
+    }
+    con.query(`SELECT * FROM listings WHERE listing_owner=${mysql.escape(req.user.id)};`, (errorFindingListings, userListings, fields) => {
+      if (errorFindingListings) {
+        console.log(errorFindingListings);
+        con.end();
+        req.flash('error', 'Error.');
+        return res.redirect('/dashboard');
+      }
+      con.end();
+      return res.render('platform/my-listings.hbs', {
+        page_name: 'My Product Listngs',
+        user_first_name: currentUser[0].first_name,
+        user_last_name: currentUser[0].last_name,
+        user_email: currentUser[0].email,
+        error: req.flash('error'),
+        success: req.flash('success'),
+        userListings: userListings,
+      });
     });
   });
 });
