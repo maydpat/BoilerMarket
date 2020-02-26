@@ -38,12 +38,20 @@ router.get('/cart', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
       req.flash('error', 'Error.');
       return res.redirect('/dashboard');
     }
+    totalPrice = 0;
+    for(i in cartListings) {
+      console.log(cartListings);
+      console.log(cartListings[i]);
+      totalPrice += cartListings[i].price;
+    }
+    totalPrice = totalPrice.toFixed(2);
     con.end();
     return res.render('platform/cart.hbs', {
       page_name: 'My Cart',
       error: req.flash('error'),
       success: req.flash('success'),
       productsInCart: cartListings,
+      totalPrice: totalPrice
     });
   });
 });
