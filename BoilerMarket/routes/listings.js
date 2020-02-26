@@ -37,22 +37,23 @@ router.get('/listings', AuthenticationFunctions.ensureAuthenticated, (req, res) 
   });
 });
 
-// router.get('/listings', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
-//   let con = mysql.createConnection(dbInfo);
-//   con.query(`SELECT * FROM listings`/*TODO: Add condition to select only listings which have not been purchased or are in someone's cart*/, (findListingsError, listings, fields)) => {
-//     if (findListingsError) {
-//       con.end();
-//       req.flash('error', 'Error.');
-//       return res.redirect('/dashboard');
-//     }
-//     con.end();
-//     return res.render('platform/listings.hbs', {
-//       error: req.flash('error'),
-//       success: req.flash('success'),
-//       page_name: 'BoilerMarket Listings',
-//       listings: listings
-//     });
-//   }
-// });
+router.get('/listings/create-listing', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+  let con = mysql.createConnection(dbInfo);
+  con.query(`SELECT * FROM users WHERE id=${mysql.escape(req.user.id)};`, (findCurrentUserError, currentUser, fields) => {
+    if (findCurrentUserError) {
+      console.log(findCurrentUserError);
+      con.end();
+      req.flash('error', 'Error.');
+      return res.redirect('/dashboard');
+    }
+    con.end();
+    return res.render('platform/create-a-listing.hbs', {
+      page_name: 'Create a Listing',
+      user_first_name: currentUser[0].first_name,
+      user_last_name: currentUser[0].last_name,
+      user_email: currentUser[0].email,
+    });
+  });
+});
 
 module.exports = router;
