@@ -15,7 +15,7 @@ var request = require("request");
 const app = express();
 
 // Start HTTP Server
-const port = 80;
+const port = 8000;
 
 app.engine('.hbs', exphbs({
   extname: 'hbs',
@@ -32,7 +32,9 @@ const registerRoute = require('./routes/register');
 const logoutRoute = require('./routes/logout');
 const dashboardRoute = require('./routes/dashboard');
 const profileRoute = require('./routes/profile');
+const cartRoute = require('./routes/cart');
 const listingsRoute = require('./routes/listings');
+const forgotPasswordRoute = require('./routes/forgot-password')
 
 // Static folder
 app.use(express.static(path.join(__dirname, '/public')));
@@ -59,7 +61,9 @@ app.use('/', registerRoute);
 app.use('/', logoutRoute);
 app.use('/', dashboardRoute);
 app.use('/', profileRoute);
+app.use('/', cartRoute);
 app.use('/', listingsRoute);
+app.use('/', forgotPasswordRoute);
 
 app.listen(port, () =>{
   console.log(`Server started on port ${port}`);

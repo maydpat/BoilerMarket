@@ -75,4 +75,43 @@ router.post('/profile/update-profile', AuthenticationFunctions.ensureAuthenticat
     });
 });
 
+router.post('/profile/change-password', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+    req.checkBody('old_password', 'Old Password is required').notEmpty();
+    req.checkBody('new_password', 'New Password is required').notEmpty();
+    req.checkBody('confirm_password', 'Confirm New Password is required.').notEmpty();
+    req.checkBody('new_password', 'Passwords do not match.').equals(req.body.confirm_password);
+    let formErrors = req.validationErrors();
+    if (formErrors) {
+        req.flash('error', formErrors[0].msg);
+        return res.redirect('/profile');
+    }
+    let con = mysql.createConnection(dbInfo);
+    
+    let salt = bcrypt.genSaltSync(10);
+    let hashedPassword = bcrypt.hashSync(req.body.new_password, salt);
+    con.query(`SELECT * FROM users WHERE id=${mysql.escape(req.user.id)}`, (findUserError, results, fields) => {
+        if (findUserError) {
+            con.end();
+            console.log(findUserError);
+            req.flash('error', 'Error finding user');
+            return res.redirect('/profile');
+        }
+        if (!bcrypt.compareSync(req.body.old_password, results[0].password)) {
+            req.flash('error', 'Incorrect Password entered for Old Password');
+            return res.redirect('/profile');
+        }
+        con.query(`UPDATE users SET password=${mysql.escape(hashedPassword)} WHERE id=${mysql.escape(req.user.id)};`, (updatePasswordError, results, fields) => {
+            if (updatePasswordError) {
+                con.end();
+                console.log(updatePasswordError);
+                req.flash('error', 'Error updating profile.');
+                return res.redirect('/profile');
+            }
+            con.end();
+            req.flash('success', 'Successfully updated password.');
+            return res.redirect('/profile');
+        });
+    });
+});
+
 module.exports = router;
