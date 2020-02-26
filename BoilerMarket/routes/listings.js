@@ -217,4 +217,8 @@ router.post(`/listings/edit/:id`, AuthenticationFunctions.ensureAuthenticated, (
   });
 });
 
+router.get('/listings/view/:id', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+  return res.render('platform/view-listing.hbs');
+})
+
 module.exports = router;
