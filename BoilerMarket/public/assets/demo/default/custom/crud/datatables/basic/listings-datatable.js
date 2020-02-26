@@ -24,14 +24,6 @@ var DatatablesBasicBasic = {
                 targets: 4,
                 render: function(e, a, t, n) {
                     var s = {
-                        1: {
-                            title: "Pending",
-                            class: "m-badge--brand"
-                        },
-                        2: {
-                            title: "Delivered",
-                            class: " m-badge--metal"
-                        },
                         0: {
                             title: "Listed",
                             class: " m-badge--primary"
@@ -39,18 +31,6 @@ var DatatablesBasicBasic = {
                         1: {
                             title: "Bought",
                             class: " m-badge--success"
-                        },
-                        5: {
-                            title: "Info",
-                            class: " m-badge--info"
-                        },
-                        6: {
-                            title: "Danger",
-                            class: " m-badge--danger"
-                        },
-                        7: {
-                            title: "Warning",
-                            class: " m-badge--warning"
                         }
                     };
                     return void 0 === s[e] ? e : '<span class="m-badge ' + s[e].class + ' m-badge--wide">' + s[e].title + "</span>"
@@ -88,20 +68,12 @@ var DatatablesBasicBasic = {
                 title: "Actions",
                 orderable: !1,
                 render: function(e, a, t, n) {
-                    return `\n                      <a href="/listings/edit/${t[6]}" class="m-portlet__nav-link btn m-btn m-btn--hover-brand m-btn--icon m-btn--icon-only m-btn--pill" title="View">\n                          <i class="la la-edit"></i>\n                        </a>`
+                    return `\n<a href="/listings/edit/${t[6]}" class="m-portlet__nav-link btn m-btn m-btn--hover-brand m-btn--icon m-btn--icon-only m-btn--pill" title="View">\n<i class="la la-edit"></i>\n</a>`
                 }
             }, {
                 targets: 4,
                 render: function(e, a, t, n) {
                     var s = {
-                        1: {
-                            title: "Pending",
-                            class: "m-badge--brand"
-                        },
-                        2: {
-                            title: "Delivered",
-                            class: " m-badge--metal"
-                        },
                         0: {
                             title: "Listed",
                             class: " m-badge--primary"
@@ -109,18 +81,6 @@ var DatatablesBasicBasic = {
                         1: {
                             title: "Bought",
                             class: " m-badge--success"
-                        },
-                        5: {
-                            title: "Info",
-                            class: " m-badge--info"
-                        },
-                        6: {
-                            title: "Danger",
-                            class: " m-badge--danger"
-                        },
-                        7: {
-                            title: "Warning",
-                            class: " m-badge--warning"
                         }
                     };
                     return void 0 === s[e] ? e : '<span class="m-badge ' + s[e].class + ' m-badge--wide">' + s[e].title + "</span>"
