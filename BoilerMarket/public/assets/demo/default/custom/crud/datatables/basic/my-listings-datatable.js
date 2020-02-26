@@ -1,7 +1,7 @@
 var DatatablesBasicBasic = {
     init: function() {
         var e;
-        (e = $("#m_table_1")).DataTable({
+        (e = $("#my_listings_table_1")).DataTable({
             responsive: !0,
             dom: "<'row'<'col-sm-12'tr>>\n\t\t\t<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7 dataTables_pager'lp>>",
             lengthMenu: [5, 10, 25, 50],

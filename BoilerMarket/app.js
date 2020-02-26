@@ -15,7 +15,7 @@ var request = require("request");
 const app = express();
 
 // Start HTTP Server
-const port = 8000;
+const port = 80;
 
 app.engine('.hbs', exphbs({
   extname: 'hbs',

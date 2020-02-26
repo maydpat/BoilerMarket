@@ -38,7 +38,6 @@ router.get('/profile', AuthenticationFunctions.ensureAuthenticated, (req, res) =
             return res.redirect('/dashboard');
         }
         con.end();
-        console.log(users);
         return res.render('platform/profile.hbs', {
             error: req.flash('error'),
             success: req.flash('success'),

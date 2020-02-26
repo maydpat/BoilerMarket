@@ -36,4 +36,54 @@ router.get('/cart', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
     });
 });
 
+router.get(`/cart/add/:id`, AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+  let con = mysql.createConnection(dbInfo);
+  con.query(`SELECT * FROM listings WHERE id=${mysql.escape(req.params.id)};`, (errorFindingListings, listings, fields) => {
+    if (errorFindingListings) {
+      console.log(errorFindingListings);
+      con.end();
+      req.flash('error', 'Error.');
+      return res.redirect('/listings');
+    }
+    if (listings.length === 0) {
+      con.end();
+      req.flash('error', 'Error. Listing not found.');
+      return res.redirect('/listings');
+    } else if (listings[0].status === 1) {
+      con.end();
+      req.flash('error', 'Error. Listing cannot be added to cart as it is in a transaction.');
+      return res.redirect('/listings');
+    } else if (listings[0].listing_owner === req.user.id) {
+      con.end();
+      req.flash('error', 'Error. You cannot add your own listing to your cart.');
+      return res.redirect('/listings');
+    } else {
+      con.query(`SELECT * FROM cart WHERE listing_id=${mysql.escape(req.params.id)} AND buyer=${mysql.escape(req.user.id)};`, (errorFindingDuplicate, resultFindingDuplicate, fields) => {
+        if (errorFindingDuplicate) {
+          console.log(errorFindingDuplicate);
+          con.end();
+          req.flash('error', 'Error.');
+          return res.redirect('/listings');
+        }
+        if (resultFindingDuplicate.length === 1) {
+          con.end();
+          req.flash('error', 'Error. This listing is already in your cart.');
+          return res.redirect('/listings');
+        }
+        con.query(`INSERT INTO cart (listing_id, buyer, seller) VALUES (${mysql.escape(req.params.id)}, ${mysql.escape(req.user.id)}, ${mysql.escape(listings[0].listing_owner)});`, (errorInsertingToCart, insertToCartResult, fields) => {
+          if (errorInsertingToCart) {
+            console.log(errorInsertingToCart);
+            con.end();
+            req.flash('error', "Error.");
+            return res.redirect('/listings');
+          }
+          con.end();
+          req.flash('success', 'Successfully added to your cart.');
+          return res.redirect('/listings');
+        });
+      });
+    }
+  });
+});
+
 module.exports = router;

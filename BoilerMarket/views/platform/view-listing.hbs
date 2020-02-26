@@ -1,0 +1,82 @@
+{{> header}}
+<div class="m-grid__item m-grid__item--fluid m-wrapper">
+
+	<div class="m-content">
+		{{#if error}}
+		<div class="alert alert-danger alert-dismissible fade show" role="alert">
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+			</button>
+			<strong>Oh snap!</strong> {{error}}
+		</div>
+		{{/if}}
+		{{#if success}}
+		<div class="alert alert-success alert-dismissible fade show" role="alert">
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+			</button>
+			<strong>Success!</strong> {{success}}
+		</div>
+		{{/if}}
+
+		<div class="row">
+            <div class="col-lg-6">
+
+                <!--begin::Portlet-->
+                <div class="m-portlet">
+                    <div class="m-portlet__head">
+                        <div class="m-portlet__head-caption">
+                            <div class="m-portlet__head-title">
+                                <span class="m-portlet__head-icon m--hide">
+                                    <i class="la la-gear"></i>
+                                </span>
+                                <h3 class="m-portlet__head-text">
+                                    Viewing Listing: {{listing.title}} by NAME
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--begin::Form-->
+
+                    <form class="m-form">
+                        <div class="m-portlet__body">
+                            <div class="m-form__section m-form__section--first">
+                                <div class="form-group m-form__group">
+                                    <label>Title</label>
+                                    <input type="text" disabled="" class="form-control m-input" value="{{listing.title}}">
+                                </div>
+                                <div class="form-group m-form__group">
+                                    <label>Description</label>
+                                    <input type="text" disabled="" class="form-control m-input" value="{{listing.description}}">
+                                </div>
+                                <div class="form-group m-form__group">
+                                    <label>Price</label>
+                                    <input type="number" value="{{listing.price}}" disabled="" class="form-control m-input">
+                                </div>
+                                <div class="form-group m-form__group">
+                                    <label for="exampleSelect1">Listing Type</label>
+                                    <select class="form-control m-input" required="" name="listing_type" id="exampleSelect1">
+                                        <option value="1">Sale</option>
+                                        <option value="2">Rent</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="m-portlet__foot m-portlet__foot--fit">
+                            <div class="m-form__actions m-form__actions">
+                                <a href="/listings" class="btn btn-primary">Go Back</a>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!--end::Form-->
+                </div>
+
+                <!--end::Portlet-->
+            </div>
+        </div>
+
+		<!--End::Main Portlet-->
+	</div>
+</div>
+
+{{> footer}}
