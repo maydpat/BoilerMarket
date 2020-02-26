@@ -218,7 +218,39 @@ router.post(`/listings/edit/:id`, AuthenticationFunctions.ensureAuthenticated, (
 });
 
 router.get('/listings/view/:id', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
-  return res.render('platform/view-listing.hbs');
-})
+  let con = mysql.createConnection(dbInfo);
+  con.query(`SELECT * FROM users WHERE id=${mysql.escape(req.user.id)};`, (findCurrentUserError, currentUser, fields) => {
+    if (findCurrentUserError) {
+      console.log(findCurrentUserError);
+      con.end();
+      req.flash('error', 'Error.');
+      return res.redirect('/listings/my-listings');
+    }
+    con.query(`SELECT * FROM listings WHERE id=${mysql.escape(req.params.id)};`, (errorFindingListings, listings, fields) => {
+      if (errorFindingListings) {
+        console.log(errorFindingListings);
+        con.end();
+        req.flash('error', 'Error.');
+        return res.redirect('/listings/my-listings');
+      }
+      if (listings.length === 0) {
+        con.end();
+        req.flash('error', 'Error. Listing not found.');
+        return res.redirect('/listings/my-listings');
+      } else {
+        con.end();
+        return res.render('platform/view-listing.hbs', {
+          page_name: 'View Listing',
+          user_first_name: currentUser[0].first_name,
+          user_last_name: currentUser[0].last_name,
+          user_email: currentUser[0].email,
+          error: req.flash('error'),
+          success: req.flash('success'),
+          listing: listings[0],
+        });
+      }
+    });
+  });
+});
 
 module.exports = router;

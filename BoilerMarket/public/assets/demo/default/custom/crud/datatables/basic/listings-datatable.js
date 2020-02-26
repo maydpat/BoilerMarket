@@ -18,7 +18,7 @@ var DatatablesBasicBasic = {
                 title: "Actions",
                 orderable: !1,
                 render: function(e, a, t, n) {
-                    return `\n<a href="/listings/view/${t[6]}" class="m-portlet__nav-link btn m-btn m-btn--hover-brand m-btn--icon m-btn--icon-only m-btn--pill" title="View">\n                          <i class="la la-edit"></i>\n                        </a> <a href="/listings/add-to-cart/${t[6]}" class="m-portlet__nav-link btn m-btn m-btn--hover-brand m-btn--icon m-btn--icon-only m-btn--pill" title="View">\n                          <i class="la la-edit"></i>\n                        </a>`
+                    return `\n<a href="/listings/view/${t[6]}" class="m-portlet__nav-link btn m-btn m-btn--hover-brand m-btn--icon m-btn--icon-only m-btn--pill" title="View">\n                          <i class="la la-edit"></i>\n                        </a> <a href="/cart/add/${t[6]}" class="m-portlet__nav-link btn m-btn m-btn--hover-brand m-btn--icon m-btn--icon-only m-btn--pill" title="View">\n                          <i class="la la-edit"></i>\n                        </a>`
                 }
             }, {
                 targets: 4,
