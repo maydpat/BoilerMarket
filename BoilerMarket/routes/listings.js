@@ -143,7 +143,11 @@ router.get(`/listings/edit/:id`, AuthenticationFunctions.ensureAuthenticated, (r
       }
       if (listings.length === 0) {
         con.end();
-        req.flash('error', 'Error.');
+        req.flash('error', 'Error. Listing not found.');
+        return res.redirect('/listings/my-listings');
+      } else if (listings[0].status === 1) {
+        con.end();
+        req.flash('error', 'Error. Transaction is on-going. Listing cannot be edited.');
         return res.redirect('/listings/my-listings');
       } else {
         con.end();
@@ -173,16 +177,34 @@ router.post(`/listings/edit/:id`, AuthenticationFunctions.ensureAuthenticated, (
       return res.redirect(`/listings/edit/${req.params.id}`);
   }
   let con = mysql.createConnection(dbInfo);
-  con.query(`UPDATE listings SET title=${mysql.escape(req.body.listing_title)}, description=${mysql.escape(req.body.listing_description)}, price=${mysql.escape(Number(req.body.listing_price))}, listing_type=${mysql.escape(Number(req.body.listing_type))} WHERE id=${mysql.escape(req.params.id)};`, (updateListingError, updateListingResult, fields) => {
-    if (updateListingError) {
-      console.log(updateListingError);
+  con.query(`SELECT * FROM listings WHERE id=${mysql.escape(req.params.id)};`, (errorFindingListings, listings, fields) => {
+    if (errorFindingListings) {
+      console.log(errorFindingListings);
       con.end();
-      req.flash('error', 'Error updating listing.');
-      return res.redirect(`/listings/edit/${req.params.id}`);
+      req.flash('error', 'Error.');
+      return res.redirect('/listings/my-listings');
     }
-    con.end();
-    req.flash('success', 'Successfully updated listing.');
-    return res.redirect('/listings/my-listings');
+    if (listings.length === 0) {
+      con.end();
+      req.flash('error', 'Error. Listing not found.');
+      return res.redirect('/listings/my-listings');
+    } else if (listings[0].status === 1) {
+      con.end();
+      req.flash('error', 'Error. Transaction is on-going. Listing cannot be edited.');
+      return res.redirect('/listings/my-listings');
+    } else {
+      con.query(`UPDATE listings SET title=${mysql.escape(req.body.listing_title)}, description=${mysql.escape(req.body.listing_description)}, price=${mysql.escape(Number(req.body.listing_price))}, listing_type=${mysql.escape(Number(req.body.listing_type))} WHERE id=${mysql.escape(req.params.id)};`, (updateListingError, updateListingResult, fields) => {
+        if (updateListingError) {
+          console.log(updateListingError);
+          con.end();
+          req.flash('error', 'Error updating listing.');
+          return res.redirect(`/listings/edit/${req.params.id}`);
+        }
+        con.end();
+        req.flash('success', 'Successfully updated listing.');
+        return res.redirect('/listings/my-listings');
+      });
+    }
   });
 });
 

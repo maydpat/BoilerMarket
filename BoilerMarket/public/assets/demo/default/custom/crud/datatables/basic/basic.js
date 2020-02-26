@@ -31,12 +31,12 @@ var DatatablesBasicBasic = {
                             title: "Delivered",
                             class: " m-badge--metal"
                         },
-                        3: {
-                            title: "Canceled",
+                        0: {
+                            title: "Listed",
                             class: " m-badge--primary"
                         },
-                        4: {
-                            title: "Success",
+                        1: {
+                            title: "Bought",
                             class: " m-badge--success"
                         },
                         5: {
