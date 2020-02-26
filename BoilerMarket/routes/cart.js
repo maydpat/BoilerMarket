@@ -30,10 +30,30 @@ let dbInfo = {
 };
 
 router.get('/cart', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+  let con = mysql.createConnection(dbInfo);
+  con.query(`SELECT * FROM cart JOIN listings ON cart.listing_id=listings.id WHERE buyer=${mysql.escape(req.user.id)};`, (errorFindingCartListings, cartListings, fields) => {
+    if (errorFindingCartListings) {
+      console.log(errorFindingCartListings);
+      con.end();
+      req.flash('error', 'Error.');
+      return res.redirect('/dashboard');
+    }
+    totalPrice = 0;
+    for(i in cartListings) {
+      console.log(cartListings);
+      console.log(cartListings[i]);
+      totalPrice += cartListings[i].price;
+    }
+    totalPrice = totalPrice.toFixed(2);
+    con.end();
     return res.render('platform/cart.hbs', {
+      page_name: 'My Cart',
       error: req.flash('error'),
-      success: req.flash('success')
+      success: req.flash('success'),
+      productsInCart: cartListings,
+      totalPrice: totalPrice
     });
+  });
 });
 
 router.get(`/cart/add/:id`, AuthenticationFunctions.ensureAuthenticated, (req, res) => {
@@ -83,6 +103,20 @@ router.get(`/cart/add/:id`, AuthenticationFunctions.ensureAuthenticated, (req, r
         });
       });
     }
+  });
+});
+
+router.get(`/cart/remove/:id`, AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+  let con = mysql.createConnection(dbInfo);
+  con.query(`DELETE FROM cart WHERE buyer=${mysql.escape(req.user.id)} AND listing_id=${mysql.escape(req.params.id)};`, (errorRemovingListing, results, fields) => {
+    if (errorRemovingListing) {
+      console.log(errorRemovingListing);
+      con.end();
+      req.flash('error', 'Error.');
+      return res.redirect('/cart');
+    }
+    con.end();
+    return res.redirect('/cart');
   });
 });
 
