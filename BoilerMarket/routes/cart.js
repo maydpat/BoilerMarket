@@ -30,10 +30,22 @@ let dbInfo = {
 };
 
 router.get('/cart', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+  let con = mysql.createConnection(dbInfo);
+  con.query(`SELECT * FROM cart JOIN listings ON cart.listing_id=listings.id WHERE buyer=${mysql.escape(req.user.id)};`, (errorFindingCartListings, cartListings, fields) => {
+    if (errorFindingCartListings) {
+      console.log(errorFindingCartListings);
+      con.end();
+      req.flash('error', 'Error.');
+      return res.redirect('/dashboard');
+    }
+    con.end();
     return res.render('platform/cart.hbs', {
+      page_name: 'My Cart',
       error: req.flash('error'),
-      success: req.flash('success')
+      success: req.flash('success'),
+      productsInCart: cartListings,
     });
+  });
 });
 
 router.get(`/cart/add/:id`, AuthenticationFunctions.ensureAuthenticated, (req, res) => {
@@ -84,6 +96,10 @@ router.get(`/cart/add/:id`, AuthenticationFunctions.ensureAuthenticated, (req, r
       });
     }
   });
+});
+
+router.get(`/cart/remove/:id`, AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+
 });
 
 module.exports = router;
