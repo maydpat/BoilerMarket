@@ -113,7 +113,7 @@ router.get('/listings/my-listings', AuthenticationFunctions.ensureAuthenticated,
       }
       con.end();
       return res.render('platform/my-listings.hbs', {
-        page_name: 'My Product Listngs',
+        page_name: 'My Product Listings',
         user_first_name: currentUser[0].first_name,
         user_last_name: currentUser[0].last_name,
         user_email: currentUser[0].email,
@@ -122,6 +122,67 @@ router.get('/listings/my-listings', AuthenticationFunctions.ensureAuthenticated,
         userListings: userListings,
       });
     });
+  });
+});
+
+router.get(`/listings/edit/:id`, AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+  let con = mysql.createConnection(dbInfo);
+  con.query(`SELECT * FROM users WHERE id=${mysql.escape(req.user.id)};`, (findCurrentUserError, currentUser, fields) => {
+    if (findCurrentUserError) {
+      console.log(findCurrentUserError);
+      con.end();
+      req.flash('error', 'Error.');
+      return res.redirect('/listings/my-listings');
+    }
+    con.query(`SELECT * FROM listings WHERE id=${mysql.escape(req.params.id)};`, (errorFindingListings, listings, fields) => {
+      if (errorFindingListings) {
+        console.log(errorFindingListings);
+        con.end();
+        req.flash('error', 'Error.');
+        return res.redirect('/listings/my-listings');
+      }
+      if (listings.length === 0) {
+        con.end();
+        req.flash('error', 'Error.');
+        return res.redirect('/listings/my-listings');
+      } else {
+        con.end();
+        console.log(listings);
+        return res.render('platform/edit-my-listing.hbs', {
+          page_name: 'Edit Product Listing',
+          user_first_name: currentUser[0].first_name,
+          user_last_name: currentUser[0].last_name,
+          user_email: currentUser[0].email,
+          error: req.flash('error'),
+          success: req.flash('success'),
+          listing: listings[0],
+        });
+      }
+    });
+  });
+});
+
+router.post(`/listings/edit/:id`, AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+  req.checkBody('listing_title', 'Title field is required.').notEmpty();
+  req.checkBody('listing_description', 'Description field is required.').notEmpty();
+  req.checkBody('listing_price', 'Price field is required.').notEmpty();
+  req.checkBody('listing_type', 'Listing Type field is required.').notEmpty();
+  let formErrors = req.validationErrors();
+  if (formErrors) {
+      req.flash('error', formErrors[0].msg);
+      return res.redirect(`/listings/edit/${req.params.id}`);
+  }
+  let con = mysql.createConnection(dbInfo);
+  con.query(`UPDATE listings SET title=${mysql.escape(req.body.listing_title)}, description=${mysql.escape(req.body.listing_description)}, price=${mysql.escape(Number(req.body.listing_price))}, listing_type=${mysql.escape(Number(req.body.listing_type))} WHERE id=${mysql.escape(req.params.id)};`, (updateListingError, updateListingResult, fields) => {
+    if (updateListingError) {
+      console.log(updateListingError);
+      con.end();
+      req.flash('error', 'Error updating listing.');
+      return res.redirect(`/listings/edit/${req.params.id}`);
+    }
+    con.end();
+    req.flash('success', 'Successfully updated listing.');
+    return res.redirect('/listings/my-listings');
   });
 });
 
