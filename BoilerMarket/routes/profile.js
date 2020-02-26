@@ -43,6 +43,7 @@ router.get('/profile', AuthenticationFunctions.ensureAuthenticated, (req, res) =
             success: req.flash('success'),
             page_name: 'My Profile',
             user_email: users[0].email,
+            user_paypal_email: users[0].paypal_email,
             user_phone_number: users[0].phone_number,
             user_location: users[0].location,
             user_first_name: users[0].first_name,
@@ -61,7 +62,7 @@ router.post('/profile/update-profile', AuthenticationFunctions.ensureAuthenticat
         return res.redirect('/profile');
     }
     let con = mysql.createConnection(dbInfo);
-    con.query(`UPDATE users SET phone_number=${mysql.escape(req.body.phone_number)}, location=${mysql.escape(req.body.location)}, email=${mysql.escape(req.body.email)} WHERE id=${mysql.escape(req.user.id)};`, (updateUserError, results, fields) => {
+    con.query(`UPDATE users SET phone_number=${mysql.escape(req.body.phone_number)}, location=${mysql.escape(req.body.location)}, email=${mysql.escape(req.body.email)}, paypal_email=${mysql.escape(req.body.paypal_email)} WHERE id=${mysql.escape(req.user.id)};`, (updateUserError, results, fields) => {
         if (updateUserError) {
             con.end();
             console.log(updateUserError);
