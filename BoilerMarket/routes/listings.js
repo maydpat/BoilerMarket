@@ -38,14 +38,23 @@ router.get('/listings', AuthenticationFunctions.ensureAuthenticated, (req, res) 
       req.flash('error', 'Error.');
       return res.redirect('/dashboard');
     }
-    con.end();
-    return res.render('platform/listings.hbs', {
-      page_name: 'BoilerMarket Listings',
-      error: req.flash('error'),
-      success: req.flash('success'),
-      user_first_name: currentUser[0].first_name,
-      user_last_name: currentUser[0].last_name,
-      user_email: currentUser[0].email,
+    con.query(`SELECT * FROM listings WHERE status=0;`, (obtainListingsError, listings, fields) => {
+      if (obtainListingsError) {
+        console.log(obtainListingsError);
+        con.end();
+        req.flash('error', 'Error.');
+        return res.redirect('/dashboard');
+      }
+      con.end();
+      return res.render('platform/listings.hbs', {
+        page_name: 'BoilerMarket Listings',
+        error: req.flash('error'),
+        success: req.flash('success'),
+        user_first_name: currentUser[0].first_name,
+        user_last_name: currentUser[0].last_name,
+        user_email: currentUser[0].email,
+        listings: listings
+      });
     });
   });
 });
