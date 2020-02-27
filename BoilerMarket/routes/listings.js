@@ -100,7 +100,7 @@ router.post('/listings/create-listing', AuthenticationFunctions.ensureAuthentica
       return res.redirect('/listings/create-listing');
     }
     if (req.body.listing_type == 2) {
-      con.query(`UPDATE listings SET duration=${mysql.escape(req.body.duration)} WHERE id=${mysql.escape(newID)};`, (setListingDurationError, setDurationResult, fields) => {
+      con.query(`UPDATE listings SET duration=${mysql.escape(Number(req.body.duration))} WHERE id=${mysql.escape(newID)};`, (setListingDurationError, setDurationResult, fields) => {
         if (setListingDurationError) {
           console.log(setListingDurationError);
           con.end();
