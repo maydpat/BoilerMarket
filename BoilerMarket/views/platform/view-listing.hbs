@@ -54,11 +54,27 @@
                                 </div>
                                 <div class="form-group m-form__group">
                                     <label for="exampleSelect1">Listing Type</label>
-                                    <select class="form-control m-input" required="" name="listing_type" id="exampleSelect1">
+                                    <select id="listingType" class="form-control m-input" disabled="" name="listing_type" id="exampleSelect1">
+                                        {{#select listing.listing_type}}
                                         <option value="1">Sale</option>
                                         <option value="2">Rent</option>
+                                        {{/select}}
                                     </select>
                                 </div>
+                                <div id="rentDurationField" class="form-group m-form__group" style="display:none;">
+                                    <label>Rent Duration (Days)</label>
+                                    <input disabled="" id="rentDurationFieldInput" type="number" name="rent_duration" class="form-control m-input" value="{{listing.duration}}">
+                                </div>
+                                <script>
+                                    function checkFields(){
+                                        if( $('#listingType').val() != '2' ){
+                                            $('#rentDurationField').hide();
+                                        }else{
+                                            $('#rentDurationField').show();
+                                        }
+                                    }
+                                    checkFields();
+                                </script>
                             </div>
                         </div>
                         <div class="m-portlet__foot m-portlet__foot--fit">

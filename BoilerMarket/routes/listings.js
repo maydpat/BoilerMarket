@@ -111,10 +111,11 @@ router.post('/listings/create-listing', AuthenticationFunctions.ensureAuthentica
         req.flash('success', 'Successfully created listing.');
         return res.redirect('/listings/my-listings');
       });
+    } else {
+      con.end();
+      req.flash('success', 'Successfully created listing.');
+      return res.redirect('/listings/my-listings');
     }
-    con.end();
-    req.flash('success', 'Successfully created listing.');
-    return res.redirect('/listings/my-listings');
   });
 });
 

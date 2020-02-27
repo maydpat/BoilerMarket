@@ -56,6 +56,7 @@ router.post('/profile/update-profile', AuthenticationFunctions.ensureAuthenticat
     req.checkBody('email', 'Email field is required.').notEmpty();
     req.checkBody('phone_number', 'Phone Number field is required.').notEmpty();
     req.checkBody('location', 'Location (ZIP) field is required.').notEmpty();
+    req.checkBody('paypal_email', 'PayPal field is required.').notEmpty();
     let formErrors = req.validationErrors();
     if (formErrors) {
         req.flash('error', formErrors[0].msg);

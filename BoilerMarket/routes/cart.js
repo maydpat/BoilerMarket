@@ -40,8 +40,6 @@ router.get('/cart', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
     }
     totalPrice = 0;
     for(i in cartListings) {
-      console.log(cartListings);
-      console.log(cartListings[i]);
       totalPrice += cartListings[i].price;
     }
     totalPrice = totalPrice.toFixed(2);
@@ -116,7 +114,49 @@ router.get(`/cart/remove/:id`, AuthenticationFunctions.ensureAuthenticated, (req
       return res.redirect('/cart');
     }
     con.end();
+    if (results.affectedRows === 0) {
+      req.flash('error', 'Listing not found in your cart.');
+      return res.redirect('/cart');
+    }
+    req.flash('success', 'Successfully removed listing from your cart.');
     return res.redirect('/cart');
+  });
+});
+
+router.get(`/cart/transact/:id`, AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+  let con = mysql.createConnection(dbInfo);
+  con.query(`SELECT * FROM cart WHERE listing_id=${mysql.escape(req.params.id)} AND buyer=${mysql.escape(req.user.id)};`, (errorFindingCartListing, cartListings, fields) => {
+    if (errorFindingCartListing) {
+      console.log(errorFindingCartListing);
+      con.end();
+      req.flash('error', 'Error.');
+      return res.redirect('/cart');
+    }
+    if (cartListings.length === 0) {
+      con.end();
+      req.flash('error', 'Error finding the listing in your cart.');
+      return res.redirect('/cart');
+    } else {
+      con.query(`DELETE FROM cart WHERE listing_id=${mysql.escape(req.params.id)};`, (errorRemovingListing, deleteListingFromCartsResult, fields) => {
+        if (errorRemovingListing) {
+          console.log(errorRemovingListing);
+          con.end();
+          req.flash('error', 'Error.');
+          return res.redirect('/cart');
+        }
+        con.query(`INSERT INTO transactions (id, listing_id, buyer, seller) VALUES (${mysql.escape(uuidv4())}, ${mysql.escape(req.params.id)}, ${mysql.escape(cartListings[0].buyer)}, ${mysql.escape(cartListings[0].seller)});`, (errorCreatingTransaction, createTransactionResult, fields) => {
+          if (errorCreatingTransaction) {
+            console.log(errorCreatingTransaction);
+            con.end();
+            req.flash('error', "Error.");
+            return res.redirect('/cart');
+          }
+          req.flash('success', "Transaction Created.");
+          con.end();
+          return res.redirect('/cart');
+        });
+      });
+    }
   });
 });
 

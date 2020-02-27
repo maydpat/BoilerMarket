@@ -42,7 +42,7 @@ router.post('/register', AuthenticationFunctions.ensureNotAuthenticated, (req, r
     req.checkBody('phone_number', 'Phone Number field is required.').notEmpty();
     req.checkBody('location', 'Location (ZIP CODE) field is required.').notEmpty();
     req.checkBody('email', 'Email field is required.').notEmpty();
-    req.checkBody('paypal_email', 'Email field is required.').notEmpty();
+    req.checkBody('paypal_email', 'PayPal Email field is required.').notEmpty();
     req.checkBody('password', 'Password field is required.').notEmpty();
     req.checkBody('password_confirm', 'Confirm password field is required.').notEmpty();
     req.checkBody('password_confirm', 'Password does not match confirmation password field.').equals(req.body.password);
