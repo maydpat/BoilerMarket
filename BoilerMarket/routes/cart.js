@@ -125,7 +125,7 @@ router.get(`/cart/remove/:id`, AuthenticationFunctions.ensureAuthenticated, (req
 
 router.get(`/cart/transact/:id`, AuthenticationFunctions.ensureAuthenticated, (req, res) => {
   let con = mysql.createConnection(dbInfo);
-  con.query(`SELECT * FROM cart WHERE listing_id=${mysql.escape(req.params.id)} AND buyer=${mysql.escape(req.user.id)};`, (errorFindingCartListing, cartListings, fields) => {
+  con.query(`SELECT * FROM cart JOIN listings ON cart.listing_id = listings.id WHERE cart.listing_id=${mysql.escape(req.params.id)} AND buyer=${mysql.escape(req.user.id)};`, (errorFindingCartListing, cartListings, fields) => {
     if (errorFindingCartListing) {
       console.log(errorFindingCartListing);
       con.end();
@@ -151,9 +151,19 @@ router.get(`/cart/transact/:id`, AuthenticationFunctions.ensureAuthenticated, (r
             req.flash('error', "Error.");
             return res.redirect('/cart');
           }
-          req.flash('success', "Transaction Created.");
-          con.end();
-          return res.redirect('/cart');
+          let updateType = 1;
+          if (cartListings[0].listing_type === 2) updateType = 2;
+          con.query(`UPDATE listings SET status=${updateType} WHERE id=${mysql.escape(req.params.id)};`, (errorUpdatingListing, updateListingResult, fields) => {
+            if (errorUpdatingListing) {
+              console.log(errorUpdatingListing);
+              con.end();
+              req.flash('error', "Error.");
+              return res.redirect('/cart');
+            }
+            req.flash('success', "Transaction Created.");
+            con.end();
+            return res.redirect('/transactions');
+          });
         });
       });
     }
