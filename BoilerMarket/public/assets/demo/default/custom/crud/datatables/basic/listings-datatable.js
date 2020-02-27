@@ -18,7 +18,7 @@ var DatatablesBasicBasic = {
                 title: "Actions",
                 orderable: !1,
                 render: function(e, a, t, n) {
-                    return `\n<a href="/listings/view/${t[6]}" class="m-portlet__nav-link btn m-btn m-btn--hover-brand m-btn--icon m-btn--icon-only m-btn--pill" title="View">\n                          <i class="la la-edit"></i>\n                        </a> <a href="/cart/add/${t[6]}" class="m-portlet__nav-link btn m-btn m-btn--hover-brand m-btn--icon m-btn--icon-only m-btn--pill" title="View">\n                          <i class="la la-edit"></i>\n                        </a>`
+                    return `\n<a href="/listings/view/${t[6]}" class="m-portlet__nav-link btn m-btn m-btn--hover-brand m-btn--icon m-btn--icon-only m-btn--pill" title="View">\n                          <i class="la la-edit"></i>\n                        </a> <a href="/cart/add/${t[6]}" class="m-portlet__nav-link btn m-btn m-btn--hover-brand m-btn--icon m-btn--icon-only m-btn--pill" title="View">\n                          <i class="la la-cart-plus"></i>\n                        </a>`
                 }
             }, {
                 targets: 4,
@@ -168,7 +168,7 @@ var DatatablesBasicBasic = {
                 title: "Actions",
                 orderable: !1,
                 render: function(e, a, t, n) {
-                    return `\n<a href="/cart/remove/${t[6]}" class="m-portlet__nav-link btn m-btn m-btn--hover-brand m-btn--icon m-btn--icon-only m-btn--pill" title="Remove">\n<i class="la la-edit"></i>\n</a>\n<a href="/cart/transact/${t[6]}" class="m-portlet__nav-link btn m-btn m-btn--hover-brand m-btn--icon m-btn--icon-only m-btn--pill" title="Remove">\n<i class="la la-edit"></i>\n</a>`
+                    return `\n<a href="/transactions/view/${t[6]}" class="m-portlet__nav-link btn m-btn m-btn--hover-brand m-btn--icon m-btn--icon-only m-btn--pill" title="View">\n<i class="la la-edit"></i>\n</a>`
                 }
             }, {
                 targets: 4,
@@ -185,6 +185,10 @@ var DatatablesBasicBasic = {
                         2: {
                             title: "Rented",
                             class: " m-badge--primary"
+                        },
+                        3: {
+                            title: "Cancelled",
+                            class: " m-badge--danger"
                         }
                     };
                     return void 0 === s[e] ? e : '<span class="m-badge ' + s[e].class + ' m-badge--wide">' + s[e].title + "</span>"

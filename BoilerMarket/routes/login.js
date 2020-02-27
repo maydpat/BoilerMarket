@@ -94,7 +94,6 @@ router.post('/login-two-factor-auth', AuthenticationFunctions.ensureNotAuthentic
 
 passport.use(new LocalStrategy({ passReqToCallback: true, },
 async function (req, username, password, done) {
-    console.log(req.body);
     if (enable2FA === 1) {
         nexmo.verify.check({
             request_id: req.body.token,

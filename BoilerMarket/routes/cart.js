@@ -144,15 +144,15 @@ router.get(`/cart/transact/:id`, AuthenticationFunctions.ensureAuthenticated, (r
           req.flash('error', 'Error.');
           return res.redirect('/cart');
         }
-        con.query(`INSERT INTO transactions (id, listing_id, buyer, seller) VALUES (${mysql.escape(uuidv4())}, ${mysql.escape(req.params.id)}, ${mysql.escape(cartListings[0].buyer)}, ${mysql.escape(cartListings[0].seller)});`, (errorCreatingTransaction, createTransactionResult, fields) => {
+        let updateType = 1;
+        if (cartListings[0].listing_type === 2) updateType = 2;
+        con.query(`INSERT INTO transactions (id, listing_id, buyer, seller, status) VALUES (${mysql.escape(uuidv4())}, ${mysql.escape(req.params.id)}, ${mysql.escape(cartListings[0].buyer)}, ${mysql.escape(cartListings[0].seller)}, ${updateType});`, (errorCreatingTransaction, createTransactionResult, fields) => {
           if (errorCreatingTransaction) {
             console.log(errorCreatingTransaction);
             con.end();
             req.flash('error', "Error.");
             return res.redirect('/cart');
           }
-          let updateType = 1;
-          if (cartListings[0].listing_type === 2) updateType = 2;
           con.query(`UPDATE listings SET status=${updateType} WHERE id=${mysql.escape(req.params.id)};`, (errorUpdatingListing, updateListingResult, fields) => {
             if (errorUpdatingListing) {
               console.log(errorUpdatingListing);
