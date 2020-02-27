@@ -38,7 +38,7 @@ router.get('/listings', AuthenticationFunctions.ensureAuthenticated, (req, res) 
       req.flash('error', 'Error.');
       return res.redirect('/dashboard');
     }
-    con.query(`SELECT * FROM listings WHERE status=0;`, (obtainListingsError, listings, fields) => {
+    con.query(`SELECT * FROM listings WHERE status=0 AND listing_owner!=${mysql.escape(req.user.id)};`, (obtainListingsError, listings, fields) => {
       if (obtainListingsError) {
         console.log(obtainListingsError);
         con.end();

@@ -31,25 +31,36 @@ let dbInfo = {
 
 router.get('/cart', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
   let con = mysql.createConnection(dbInfo);
-  con.query(`SELECT * FROM cart JOIN listings ON cart.listing_id=listings.id WHERE buyer=${mysql.escape(req.user.id)};`, (errorFindingCartListings, cartListings, fields) => {
-    if (errorFindingCartListings) {
-      console.log(errorFindingCartListings);
+  con.query(`SELECT * FROM users WHERE id=${mysql.escape(req.user.id)};`, (findCurrentUserError, currentUser, fields) => {
+    if (findCurrentUserError) {
+      console.log(findCurrentUserError);
       con.end();
       req.flash('error', 'Error.');
       return res.redirect('/dashboard');
     }
-    totalPrice = 0;
-    for(i in cartListings) {
-      totalPrice += cartListings[i].price;
-    }
-    totalPrice = totalPrice.toFixed(2);
-    con.end();
-    return res.render('platform/cart.hbs', {
-      page_name: 'My Cart',
-      error: req.flash('error'),
-      success: req.flash('success'),
-      productsInCart: cartListings,
-      totalPrice: totalPrice
+    con.query(`SELECT * FROM cart JOIN listings ON cart.listing_id=listings.id WHERE buyer=${mysql.escape(req.user.id)};`, (errorFindingCartListings, cartListings, fields) => {
+      if (errorFindingCartListings) {
+        console.log(errorFindingCartListings);
+        con.end();
+        req.flash('error', 'Error.');
+        return res.redirect('/dashboard');
+      }
+      totalPrice = 0;
+      for(i in cartListings) {
+        totalPrice += cartListings[i].price;
+      }
+      totalPrice = totalPrice.toFixed(2);
+      con.end();
+      return res.render('platform/cart.hbs', {
+        page_name: 'My Cart',
+        error: req.flash('error'),
+        success: req.flash('success'),
+        productsInCart: cartListings,
+        totalPrice: totalPrice,
+        user_first_name: currentUser[0].first_name,
+        user_last_name: currentUser[0].last_name,
+        user_email: currentUser[0].email,
+      });
     });
   });
 });
