@@ -28,7 +28,7 @@ let dbInfo = {
     port: 3306,
     multipleStatements: true
 };
-let enable2FA = 0;
+let enable2FA = 1;
 
 router.get('/login', AuthenticationFunctions.ensureNotAuthenticated, (req, res) => {
     return res.render('platform/login.hbs', {
