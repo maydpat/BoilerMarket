@@ -62,6 +62,12 @@ router.post('/profile/update-profile', AuthenticationFunctions.ensureAuthenticat
         req.flash('error', formErrors[0].msg);
         return res.redirect('/profile');
     }
+    var regex = /^1[0-9]{3}[0-9]{3}[0-9]{4}$/g;
+    var resultCheckingPhoneNumber = (req.body.phone_number).match(regex);
+    if (!resultCheckingPhoneNumber) {
+        req.flash('error', 'Wrong phone number format (+1XXXXXXXXXX).');
+        return res.redirect('/profile');
+    }
     let con = mysql.createConnection(dbInfo);
     con.query(`UPDATE users SET phone_number=${mysql.escape(req.body.phone_number)}, location=${mysql.escape(req.body.location)}, email=${mysql.escape(req.body.email)}, paypal_email=${mysql.escape(req.body.paypal_email)} WHERE id=${mysql.escape(req.user.id)};`, (updateUserError, results, fields) => {
         if (updateUserError) {

@@ -59,9 +59,9 @@ router.post('/login', AuthenticationFunctions.ensureNotAuthenticated, (req, res)
                         brand: "BoilerMarket"
                     }, (err, result) => {
                         if (err) {
-                        console.error(err);
-                        req.flash('error', '2FA Send Error.');
-                        return res.redirect('/login');
+                            console.error(err);
+                            req.flash('error', '2FA Send Error.');
+                            return res.redirect('/login');
                         } else {
                         const verifyRequestId = result.request_id;
                         console.log('request_id', verifyRequestId);

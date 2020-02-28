@@ -67,6 +67,12 @@ router.post('/register', AuthenticationFunctions.ensureNotAuthenticated, (req, r
     req.flash('error', 'Email field must be less than or equal to 240 characters and is required.');
     return res.redirect('/register');
     }
+    var regex = /^1[0-9]{3}[0-9]{3}[0-9]{4}$/g;
+    var resultCheckingPhoneNumber = (req.body.phone_number).match(regex);
+    if (!resultCheckingPhoneNumber) {
+        req.flash('error', 'Wrong phone number format (1XXXXXXXXXX).');
+        return res.redirect('/register');
+    }
     let salt = bcrypt.genSaltSync(10);
     let hashedPassword = bcrypt.hashSync(req.body.password, salt);
     let con = mysql.createConnection(dbInfo);
