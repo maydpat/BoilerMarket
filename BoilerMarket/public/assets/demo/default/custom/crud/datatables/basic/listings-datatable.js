@@ -179,16 +179,20 @@ var DatatablesBasicBasic = {
                             class: " m-badge--primary"
                         },
                         1: {
-                            title: "Bought",
+                            title: "Complete",
                             class: " m-badge--success"
                         },
                         2: {
-                            title: "Rented",
+                            title: "Rental Ongoing",
                             class: " m-badge--primary"
                         },
                         3: {
                             title: "Cancelled",
                             class: " m-badge--danger"
+                        },
+                        4: {
+                            title: "Pending",
+                            class: " m-badge--primary"
                         }
                     };
                     return void 0 === s[e] ? e : '<span class="m-badge ' + s[e].class + ' m-badge--wide">' + s[e].title + "</span>"

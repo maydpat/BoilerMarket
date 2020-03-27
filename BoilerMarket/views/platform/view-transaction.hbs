@@ -92,6 +92,9 @@
                             <div class="m-form__actions m-form__actions">
                                 <a href="/transactions" class="btn btn-primary">Go Back</a>
                                 <a href="/transactions/cancel/{{transaction.transaction_id}}" class="btn btn-danger">Cancel</a>
+                                {{#if showCompleteButton}}
+                                <a href="/transactions/complete/{{transaction.transaction_id}}" class="btn btn-success">Mark as Complete</a>
+                                {{/if}}
                             </div>
                         </div>
                     </form>

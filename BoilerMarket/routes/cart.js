@@ -155,8 +155,7 @@ router.get(`/cart/transact/:id`, AuthenticationFunctions.ensureAuthenticated, (r
           req.flash('error', 'Error.');
           return res.redirect('/cart');
         }
-        let updateType = 1;
-        if (cartListings[0].listing_type === 2) updateType = 2;
+        let updateType = 4;
         con.query(`INSERT INTO transactions (id, listing_id, buyer, seller, status) VALUES (${mysql.escape(uuidv4())}, ${mysql.escape(req.params.id)}, ${mysql.escape(cartListings[0].buyer)}, ${mysql.escape(cartListings[0].seller)}, ${updateType});`, (errorCreatingTransaction, createTransactionResult, fields) => {
           if (errorCreatingTransaction) {
             console.log(errorCreatingTransaction);
