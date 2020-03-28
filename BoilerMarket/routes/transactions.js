@@ -82,9 +82,19 @@ router.get(`/transactions/view/:id`, AuthenticationFunctions.ensureAuthenticated
       }
       con.end();
       
+      /* Show 'Mark as Complete' Button Logic */
       isBuyer = (req.user.id === transaction[0].transaction_buyer)
       isPending = (transaction[0].transaction_status === 4)
-      showCompleteButton = isBuyer && isPending
+      isNotCanceled = (transaction[0].buyer_cancel === 0 && transaction[0].seller_cancel === 0)
+      showCompleteButton = isBuyer && isPending && isNotCanceled
+      /* END - Show 'Mark as Complete' Button Logic */
+
+      /* Show 'Cancel' Button Logic */
+      cancelButtonSellerCase = transaction[0].seller_cancel !== 1 && req.user.id === transaction[0].transaction_seller
+      cancelButtonBuyerCase = transaction[0].buyer_cancel !== 1 && req.user.id === transaction[0].transaction_buyer
+      isTransactionNotComplete = transaction[0].transaction_status === 4
+      showCancelButton = isTransactionNotComplete && (cancelButtonSellerCase || cancelButtonBuyerCase)
+      /* END - Show 'Cancel' Button Logic */
 
       let showCancelMessage = null;
       if (transaction[0].transaction_status === 3) {
@@ -114,6 +124,7 @@ router.get(`/transactions/view/:id`, AuthenticationFunctions.ensureAuthenticated
         transaction: transaction[0],
         showCancelMessage: showCancelMessage,
         showCompleteButton: showCompleteButton,
+        showCancelButton: showCancelButton,
       });
     });
   });
@@ -185,7 +196,6 @@ router.get(`/transactions/cancel/:id`, AuthenticationFunctions.ensureAuthenticat
             return res.redirect('/transactions');
           }
           con.end();
-          console.log(req.params.id);
           return res.redirect(`/transactions/view/${req.params.id}`);
         });
       }
@@ -193,9 +203,9 @@ router.get(`/transactions/cancel/:id`, AuthenticationFunctions.ensureAuthenticat
   });
 });
 
-router.get(`/transactions/complete/:id`, AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+router.post(`/transactions/complete`, AuthenticationFunctions.ensureAuthenticated, (req, res) => {
   let con = mysql.createConnection(dbInfo);
-  con.query(`SELECT * FROM transactions WHERE id=${mysql.escape(req.params.id)} AND buyer = ${mysql.escape(req.user.id)};`, (errorFindingTransaction, transaction, fields) => {
+  con.query(`SELECT * FROM transactions WHERE id=${mysql.escape(req.body.transaction_id)} AND buyer = ${mysql.escape(req.user.id)};`, (errorFindingTransaction, transaction, fields) => {
     if (errorFindingTransaction) {
       console.log(errorFindingTransaction);
       con.end();
@@ -206,6 +216,11 @@ router.get(`/transactions/complete/:id`, AuthenticationFunctions.ensureAuthentic
       con.end();
       req.flash('error', 'Error. Transaction not found.');
       return res.redirect('/transactions');
+    }
+    if (transaction[0].seller_cancel === 1 || transaction[0].buyer_cancel === 1) {
+      con.end();
+      req.flash('error', 'Error. The transaction was requested to be canceled, therefore it is not able to be completed.');
+      return res.redirect(`/transactions/view/${transaction[0].id}`);
     }
 
     con.query(`SELECT * FROM listings WHERE id='${transaction[0].listing_id}';`, (errorFindingListing, listing, fields) => {
@@ -223,7 +238,7 @@ router.get(`/transactions/complete/:id`, AuthenticationFunctions.ensureAuthentic
       
       newStatus = listing[0].listing_type
 
-      con.query(`UPDATE transactions SET status=${newStatus} WHERE id=${mysql.escape(req.params.id)};`, (errorUpdateTransaction, updateTransactionResult, fields) => {
+      con.query(`UPDATE transactions SET status=${newStatus}, seller_rating=${mysql.escape(Number(req.body.seller_rating))}, buyer_cancel=0 WHERE id=${mysql.escape(req.body.transaction_id)};`, (errorUpdateTransaction, updateTransactionResult, fields) => {
         if (errorUpdateTransaction) {
           console.log(errorUpdateTransaction);
           con.end();

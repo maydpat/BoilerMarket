@@ -91,9 +91,11 @@
                         <div class="m-portlet__foot m-portlet__foot--fit">
                             <div class="m-form__actions m-form__actions">
                                 <a href="/transactions" class="btn btn-primary">Go Back</a>
+                                {{#if showCancelButton}}
                                 <a href="/transactions/cancel/{{transaction.transaction_id}}" class="btn btn-danger">Cancel</a>
+                                {{/if}}
                                 {{#if showCompleteButton}}
-                                <a href="/transactions/complete/{{transaction.transaction_id}}" class="btn btn-success">Mark as Complete</a>
+                                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#complete_transaction_modal">Mark as Complete</button>
                                 {{/if}}
                             </div>
                         </div>
@@ -105,6 +107,40 @@
                 <!--end::Portlet-->
             </div>
         </div>
+
+
+        {{#if showCompleteButton}}
+        <!--begin::Modal-->
+        <div class="modal fade" id="complete_transaction_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-sm" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Transaction Complete?</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form action="/transactions/complete" method="POST">
+                        <div class="modal-body">
+                            <p>
+                                If the transaction is complete, please rate the seller (1-5) with 1 being the lowest rating and 5 being the highest. <b>Once the transaction is marked as complete, it will be irreversible.</b>
+                            </p>
+                            <div class="form-group">
+                                <label class="form-control-label">Rating:</label>
+                                <input type="number" class="form-control" min="1" max="5" name="seller_rating" required="">
+                                <input type="hidden" class="form-control" name="transaction_id" value="{{transaction.transaction_id}}">
+                            </div>
+                        </div>
+                        <div class="modal-footer m-form__actions m-form__actions">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Mark as Complete</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!--end::Modal-->
+        {{/if}}
 
 		<!--End::Main Portlet-->
 	</div>
