@@ -48,6 +48,7 @@ router.get('/profile', AuthenticationFunctions.ensureAuthenticated, (req, res) =
             user_location: users[0].location,
             user_first_name: users[0].first_name,
             user_last_name: users[0].last_name,
+            user_two_factor: users[0].two_factor,
         });
     });
 });
@@ -69,16 +70,29 @@ router.post('/profile/update-profile', AuthenticationFunctions.ensureAuthenticat
         return res.redirect('/profile');
     }
     let con = mysql.createConnection(dbInfo);
-    con.query(`UPDATE users SET phone_number=${mysql.escape(req.body.phone_number)}, location=${mysql.escape(req.body.location)}, email=${mysql.escape(req.body.email)}, paypal_email=${mysql.escape(req.body.paypal_email)} WHERE id=${mysql.escape(req.user.id)};`, (updateUserError, results, fields) => {
-        if (updateUserError) {
+    con.query(`SELECT * FROM users WHERE id=${mysql.escape(req.user.id)};`, (errorFindingUser, users, fields) => {
+        if (errorFindingUser) {
+            console.log(errorFindingUser);
             con.end();
-            console.log(updateUserError);
-            req.flash('error', 'Error updating profile.');
+            req.flash('error', 'Error.');
+            return res.redirect('/dashboard');
+        }
+        if (!bcrypt.compareSync(req.body.password, users[0].password)) {
+            con.end();
+            req.flash('error', 'Incorrect Password entered.');
             return res.redirect('/profile');
         }
-        con.end();
-        req.flash('success', 'Successfully updated profile.');
-        return res.redirect('/profile');
+        con.query(`UPDATE users SET phone_number=${mysql.escape(req.body.phone_number)}, location=${mysql.escape(req.body.location)}, email=${mysql.escape(req.body.email)}, paypal_email=${mysql.escape(req.body.paypal_email)}, two_factor=${mysql.escape(Number(req.body.two_factor))} WHERE id=${mysql.escape(req.user.id)};`, (updateUserError, results, fields) => {
+            if (updateUserError) {
+                con.end();
+                console.log(updateUserError);
+                req.flash('error', 'Error updating profile.');
+                return res.redirect('/profile');
+            }
+            con.end();
+            req.flash('success', 'Successfully updated profile.');
+            return res.redirect('/profile');
+        });
     });
 });
 
@@ -104,6 +118,7 @@ router.post('/profile/change-password', AuthenticationFunctions.ensureAuthentica
             return res.redirect('/profile');
         }
         if (!bcrypt.compareSync(req.body.old_password, results[0].password)) {
+            con.end();
             req.flash('error', 'Incorrect Password entered for Old Password');
             return res.redirect('/profile');
         }

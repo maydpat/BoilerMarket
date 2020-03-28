@@ -46,19 +46,32 @@
                                 </div>
                                 <div class="form-group m-form__group">
                                     <label for="example_input_full_name">Email:</label>
-                                    <input type="email" name="email" class="form-control m-input" required="" maxlength="240" value="{{user_email}}">
+                                    <input type="email" name="email" class="form-control m-input" required="" maxlength="240" placeholder="Email Address" value="{{user_email}}">
                                 </div>
                                 <div class="form-group m-form__group">
                                     <label for="example_input_full_name">Paypal Email:</label>
-                                    <input type="email" name="paypal_email" class="form-control m-input" required="" maxlength="240" value="{{user_paypal_email}}">
+                                    <input type="email" name="paypal_email" class="form-control m-input" required="" maxlength="240" placeholder="PayPal Email" value="{{user_paypal_email}}">
                                 </div>
                                 <div class="form-group m-form__group">
                                     <label for="example_input_full_name">Phone Number:</label>
-                                    <input type="text" name="phone_number" class="form-control m-input" required="" maxlength="12" value="{{user_phone_number}}">
+                                    <input type="text" name="phone_number" class="form-control m-input" required="" maxlength="12" placeholder="Phone Number" value="{{user_phone_number}}">
                                 </div>
                                 <div class="form-group m-form__group">
                                     <label for="example_input_full_name">Location (ZIP):</label>
-                                    <input type="number" name="location" class="form-control m-input" required="" maxlength="12" value="{{user_location}}">
+                                    <input type="number" name="location" class="form-control m-input" required="" maxlength="12" placeholder="ZIP Code" value="{{user_location}}">
+                                </div>
+                                <div class="form-group m-form__group">
+                                    <label for="exampleSelect1">Two Factor</label>
+                                    <select id="listingType" class="form-control m-input" required="" name="two_factor" id="exampleSelect1">
+                                        {{#select user_two_factor}}
+                                        <option value="1">Enabled</option>
+                                        <option value="0">Disabled</option>
+                                        {{/select}}
+                                    </select>
+                                </div>
+                                <div class="form-group m-form__group">
+                                    <label for="example_input_full_name">Password:</label>
+                                    <input type="password" name="password" class="form-control m-input" required="" maxlength="240" placeholder="Confirm your password">
                                 </div>
                             </div>
                         </div>
