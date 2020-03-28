@@ -81,6 +81,11 @@ router.get(`/transactions/view/:id`, AuthenticationFunctions.ensureAuthenticated
         return res.redirect('/transactions');
       }
       con.end();
+      
+      isBuyer = (req.user.id === transaction[0].transaction_buyer)
+      isPending = (transaction[0].transaction_status === 4)
+      showCompleteButton = isBuyer && isPending
+
       let showCancelMessage = null;
       if (transaction[0].transaction_status === 3) {
         showCancelMessage = "This transaction has been cancelled.";
@@ -108,6 +113,7 @@ router.get(`/transactions/view/:id`, AuthenticationFunctions.ensureAuthenticated
         success: req.flash('success'),
         transaction: transaction[0],
         showCancelMessage: showCancelMessage,
+        showCompleteButton: showCompleteButton,
       });
     });
   });
@@ -183,6 +189,51 @@ router.get(`/transactions/cancel/:id`, AuthenticationFunctions.ensureAuthenticat
           return res.redirect(`/transactions/view/${req.params.id}`);
         });
       }
+    });
+  });
+});
+
+router.get(`/transactions/complete/:id`, AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+  let con = mysql.createConnection(dbInfo);
+  con.query(`SELECT * FROM transactions WHERE id=${mysql.escape(req.params.id)} AND buyer = ${mysql.escape(req.user.id)};`, (errorFindingTransaction, transaction, fields) => {
+    if (errorFindingTransaction) {
+      console.log(errorFindingTransaction);
+      con.end();
+      req.flash('error', 'Error finding transaction.');
+      return res.redirect('/transactions');
+    }
+    if (transaction.length === 0) {
+      con.end();
+      req.flash('error', 'Error. Transaction not found.');
+      return res.redirect('/transactions');
+    }
+
+    con.query(`SELECT * FROM listings WHERE id='${transaction[0].listing_id}';`, (errorFindingListing, listing, fields) => {
+      if (errorFindingListing) {
+        console.log(errorFindingListing);
+        con.end();
+        req.flash('error', 'Error finding listing.');
+        return res.redirect('/transactions');
+      }
+      if (listing.length !== 1) {
+        con.end();
+        req.flash('error', 'Error. Listing not found.');
+        return res.redirect('/transactions');
+      }
+      
+      newStatus = listing[0].listing_type
+
+      con.query(`UPDATE transactions SET status=${newStatus} WHERE id=${mysql.escape(req.params.id)};`, (errorUpdateTransaction, updateTransactionResult, fields) => {
+        if (errorUpdateTransaction) {
+          console.log(errorUpdateTransaction);
+          con.end();
+          req.flash('error', 'Error updating listing.');
+          return res.redirect('/transactions');
+        }
+        req.flash(`success`, `Transaction completed.`)
+        con.end();
+        return res.redirect(`/transactions`);
+      });
     });
   });
 });
