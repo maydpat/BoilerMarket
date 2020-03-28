@@ -86,8 +86,9 @@ router.get(`/checkout/transact/:id`, AuthenticationFunctions.ensureAuthenticated
           req.flash('error', 'Error.');
           return res.redirect('/cart');
         }
-        let updateType = 1;
-        if (cartListings[0].listing_type === 2) updateType = 2;
+        // let updateType = 1;
+        // if (cartListings[0].listing_type === 2) updateType = 2;
+        let updateType = 4;
         let transactionID = uuidv4();
         con.query(`INSERT INTO transactions (id, listing_id, buyer, seller, status) VALUES (${mysql.escape(transactionID)}, ${mysql.escape(req.params.id)}, ${mysql.escape(cartListings[0].buyer)}, ${mysql.escape(cartListings[0].seller)}, ${updateType});`, (errorCreatingTransaction, createTransactionResult, fields) => {
           if (errorCreatingTransaction) {
