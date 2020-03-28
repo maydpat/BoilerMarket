@@ -1,0 +1,178 @@
+{{> header}}
+<div class="m-grid__item m-grid__item--fluid m-wrapper">
+
+	<div class="m-content">
+		{{#if error}}
+		<div class="alert alert-danger alert-dismissible fade show" role="alert">
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+			</button>
+			<strong>Oh snap!</strong> {{error}}
+		</div>
+		{{/if}}
+		{{#if success}}
+		<div class="alert alert-success alert-dismissible fade show" role="alert">
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+			</button>
+			<strong>Success!</strong> {{success}}
+		</div>
+		{{/if}}
+
+		<div class="row">
+            <div class="col-lg-6">
+
+                <!--begin::Portlet-->
+                <div class="m-portlet">
+                    <div class="m-portlet__head">
+                        <div class="m-portlet__head-caption">
+                            <div class="m-portlet__head-title">
+                                <span class="m-portlet__head-icon m--hide">
+                                    <i class="la la-gear"></i>
+                                </span>
+                                <h3 class="m-portlet__head-text">
+                                    Viewing Listing: {{listing.title}}
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--begin::Form-->
+
+                    <form class="m-form">
+                        <div class="m-portlet__body">
+                            <div class="m-form__section m-form__section--first">
+                                <div class="form-group m-form__group">
+                                    <label>Title</label>
+                                    <input type="text" disabled="" class="form-control m-input" value="{{listing.title}}">
+                                </div>
+                                <div class="form-group m-form__group">
+                                    <label>Description</label>
+                                    <input type="text" disabled="" class="form-control m-input" value="{{listing.description}}">
+                                </div>
+                                <div class="form-group m-form__group">
+                                    <label>Price</label>
+                                    <input type="number" value="{{listing.price}}" disabled="" class="form-control m-input">
+                                </div>
+                                <div class="form-group m-form__group">
+                                    <label for="exampleSelect1">Listing Type</label>
+                                    <select id="listingType" class="form-control m-input" disabled="" name="listing_type" id="exampleSelect1">
+                                        {{#select listing.listing_type}}
+                                        <option value="1">Sale</option>
+                                        <option value="2">Rent</option>
+                                        {{/select}}
+                                    </select>
+                                </div>
+                                <div id="rentDurationField" class="form-group m-form__group" style="display:none;">
+                                    <label>Rent Duration (Days)</label>
+                                    <input disabled="" id="rentDurationFieldInput" type="number" name="rent_duration" class="form-control m-input" value="{{listing.duration}}">
+                                </div>
+                                <script>
+                                    function checkFields(){
+                                        if( $('#listingType').val() != '2' ){
+                                            $('#rentDurationField').hide();
+                                        }else{
+                                            $('#rentDurationField').show();
+                                        }
+                                    }
+                                    checkFields();
+                                </script>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!--end::Form-->
+                </div>
+
+                <!--end::Portlet-->
+            </div>
+
+            <div class="col-lg-5">
+
+                <!--begin::Portlet-->
+                <div class="m-portlet">
+                    <div class="m-portlet__head">
+                        <div class="m-portlet__head-caption">
+                            <div class="m-portlet__head-title">
+                                <span class="m-portlet__head-icon m--hide">
+                                    <i class="la la-gear"></i>
+                                </span>
+                                <h3 class="m-portlet__head-text">
+                                    Viewing Listing: {{listing.title}}
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--begin::Form-->
+
+                    <form class="m-form" action="/checkout/transact/{{listing.id}}" method="GET">
+                        <div class="m-portlet__body">
+                            <div class="m-form__section m-form__section--first">
+                                <div class="form-group m-form__group">
+                                    <label>Billing Name</label>
+                                    <input type="text" required="" class="form-control m-input" placeholder="Billing Name">
+                                </div>
+                                <div class="form-group m-form__group">
+                                    <label>Billing ZIP</label>
+                                    <input type="number" required="" class="form-control m-input" placeholder="Billing ZIP">
+                                </div>
+                                <div class="form-group m-form__group">
+                                    <label>Card Number</label>
+                                    <input type="number" required="" class="form-control m-input" placeholder="Card Number">
+                                </div>
+                                <div class="form-group m-form__group">
+                                    <label>CVC</label>
+                                    <input type="number" required="" minlength="3" maxlength="4" class="form-control m-input" placeholder="CVC">
+                                </div>
+                                <div class="form-group m-form__group">
+                                    <label for="exampleSelect1">EXP Month</label>
+                                    <select class="form-control m-input" id="exampleSelect1">
+                                        <option value=''>Year</option>
+                                        <option value='20'>2020</option>
+                                        <option value='21'>2021</option>
+                                        <option value='22'>2022</option>
+                                        <option value='23'>2023</option>
+                                        <option value='24'>2024</option>
+                                        <option value='25'>2025</option>
+                                        <option value='26'>2026</option>
+                                    </select>
+                                </div>
+                                <div class="form-group m-form__group">
+                                    <label for="exampleSelect1">EXP Month</label>
+                                    <select class="form-control m-input" id="exampleSelect1">
+                                        <option value=''>Month</option>
+                                        <option value='01'>January</option>
+                                        <option value='02'>February</option>
+                                        <option value='03'>March</option>
+                                        <option value='04'>April</option>
+                                        <option value='05'>May</option>
+                                        <option value='06'>June</option>
+                                        <option value='07'>July</option>
+                                        <option value='08'>August</option>
+                                        <option value='09'>September</option>
+                                        <option value='10'>October</option>
+                                        <option value='11'>November</option>
+                                        <option value='12'>December</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="m-portlet__foot m-portlet__foot--fit">
+                            <div class="m-form__actions m-form__actions">
+                                <a href="/cart" class="btn btn-danger">Go Back</a>
+                                <button type="submit" class="btn btn-primary">Purchase</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <!--end::Form-->
+                </div>
+
+                <!--end::Portlet-->
+            </div>
+        </div>
+
+		<!--End::Main Portlet-->
+	</div>
+</div>
+
+{{> footer}}

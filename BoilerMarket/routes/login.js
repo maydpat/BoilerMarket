@@ -53,7 +53,7 @@ router.post('/login', AuthenticationFunctions.ensureNotAuthenticated, (req, res)
         } else {
             if (bcrypt.compareSync(req.body.password, results[0].password)) {
                 con.end();
-                if (enable2FA === 1) {
+                if (enable2FA === 1 && results[0].two_factor === 1) {
                     nexmo.verify.request({
                         number: results[0].phone_number,
                         brand: "BoilerMarket"
@@ -68,7 +68,8 @@ router.post('/login', AuthenticationFunctions.ensureNotAuthenticated, (req, res)
                         return res.render('platform/login-two-factor.hbs', {
                             token: verifyRequestId,
                             username: results[0].email,
-                            password: req.body.password
+                            password: req.body.password,
+                            twofactor: 1,
                         });
                         }
                     });  
@@ -76,7 +77,8 @@ router.post('/login', AuthenticationFunctions.ensureNotAuthenticated, (req, res)
                     return res.render('platform/login-two-factor.hbs', {
                         token: 0123,
                         username: results[0].email,
-                        password: req.body.password
+                        password: req.body.password,
+                        twofactor: 0,
                     });
                 } 
             } else {
@@ -94,7 +96,7 @@ router.post('/login-two-factor-auth', AuthenticationFunctions.ensureNotAuthentic
 
 passport.use(new LocalStrategy({ passReqToCallback: true, },
 async function (req, username, password, done) {
-    if (enable2FA === 1) {
+    if (enable2FA === 1 && Number(req.body.twofactor) === 1) {
         nexmo.verify.check({
             request_id: req.body.token,
             code: req.body.sms_token

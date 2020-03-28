@@ -18,6 +18,7 @@ const nodemailer = require('nodemailer');
 
 const LocalStrategy = require('passport-local').Strategy;
 const AuthenticationFunctions = require('../Functions/Authentication.js');
+const ListingsFunctions = require('../Functions/Listings.js');
 
 let dbInfo = {
     connectionLimit: 100,
@@ -175,7 +176,6 @@ router.get(`/listings/edit/:id`, AuthenticationFunctions.ensureAuthenticated, (r
         return res.redirect('/listings/my-listings');
       } else {
         con.end();
-        console.log(listings);
         return res.render('platform/edit-my-listing.hbs', {
           page_name: 'Edit Product Listing',
           user_first_name: currentUser[0].first_name,
@@ -224,9 +224,32 @@ router.post(`/listings/edit/:id`, AuthenticationFunctions.ensureAuthenticated, (
           req.flash('error', 'Error updating listing.');
           return res.redirect(`/listings/edit/${req.params.id}`);
         }
-        con.end();
-        req.flash('success', 'Successfully updated listing.');
-        return res.redirect('/listings/my-listings');
+        if (listings[0].title !== req.body.listing_title || listings[0].description !== req.body.listing_description || listings[0].price !== Number(req.body.listing_price) || listings[0].listing_type !== Number(req.body.listing_type)) {
+          con.query(`SELECT cart.listing_id, users.email, users.first_name, users.last_name FROM cart JOIN users on cart.buyer=users.id WHERE cart.listing_id=${mysql.escape(req.params.id)};`, (errorSearchCart, cartObjects, fields) => {
+            if (errorSearchCart) {
+              console.log(errorSearchCart);
+              con.end();
+              req.flash('error', 'Error.');
+              return res.redirect('/listings/my-listings');
+            }
+            con.query(`DELETE FROM cart WHERE listing_id=${mysql.escape(req.params.id)};`, (errorDeleting, deleteResult, fields) => {
+              if (errorDeleting) {
+                console.log(errorDeleting);
+                con.end();
+                req.flash('error', 'Error.');
+                return res.redirect('/listings/my-listings');
+              }
+              ListingsFunctions.handleEditListingEmails(cartObjects, req.body.listing_title);
+              con.end();
+              req.flash('success', 'Successfully updated listing.');
+              return res.redirect('/listings/my-listings');
+            });
+          });
+        } else {
+          con.end();
+          req.flash('success', 'Successfully updated listing.');
+          return res.redirect('/listings/my-listings');
+        }
       });
     }
   });
