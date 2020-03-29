@@ -11,8 +11,12 @@ const flash = require('connect-flash');
 const session = require('express-session');
 var passport = require("passport");
 var request = require("request");
+const http = require('http');
 
 const app = express();
+
+var server = http.createServer(app);
+var io = require('socket.io').listen(server);
 
 // Start HTTP Server
 const port = 80;
@@ -38,6 +42,7 @@ const listingsRoute = require('./routes/listings');
 const forgotPasswordRoute = require('./routes/forgot-password');
 const transactionsRoute = require('./routes/transactions');
 const checkoutRoute = require('./routes/checkout');
+const chatRoute = require('./routes/chat');
 
 // Static folder
 app.use(express.static(path.join(__dirname, '/public')));
@@ -57,6 +62,13 @@ app.use(expressValidator());
 app.use(passport.initialize());
 app.use(passport.session());
 
+
+//socket io stuff
+app.use(function(req,res,next){
+  req.io = io;
+  next();
+});
+
 // Use routes
 app.use('/', indexRoute);
 app.use('/', loginRoute);
@@ -69,7 +81,8 @@ app.use('/', listingsRoute);
 app.use('/', forgotPasswordRoute);
 app.use('/', transactionsRoute);
 app.use('/', checkoutRoute);
+app.use('/', chatRoute);
 
-app.listen(port, () =>{
+server.listen(port, () =>{
   console.log(`Server started on port ${port}`);
 });
