@@ -96,6 +96,7 @@ router.get(`/transactions/view/:id`, AuthenticationFunctions.ensureAuthenticated
       showCancelButton = isTransactionNotComplete && (cancelButtonSellerCase || cancelButtonBuyerCase)
       /* END - Show 'Cancel' Button Logic */
 
+      /* Show Cancel Message Alert */
       let showCancelMessage = null;
       if (transaction[0].transaction_status === 3) {
         showCancelMessage = "This transaction has been cancelled.";
@@ -114,6 +115,14 @@ router.get(`/transactions/view/:id`, AuthenticationFunctions.ensureAuthenticated
           }
         }
       }
+      /* END - Show Cancel Message Alert */
+
+      /* Obtain chatCurrentUser & chatRecipient values */
+      let chatCurrentUser = req.user.id;
+      let chatRecipientUser = 0;
+      if (transaction[0].transaction_buyer !== req.user.id) chatRecipientUser = transaction[0].transaction_buyer;
+      else chatRecipientUser = transaction[0].transaction_seller;
+      /* END - Obtain BuyerID & Seller ID */
       return res.render('platform/view-transaction.hbs', {
         page_name: 'View Transaction',
         user_first_name: currentUser[0].first_name,
@@ -125,6 +134,8 @@ router.get(`/transactions/view/:id`, AuthenticationFunctions.ensureAuthenticated
         showCancelMessage: showCancelMessage,
         showCompleteButton: showCompleteButton,
         showCancelButton: showCancelButton,
+        chatCurrentUser: chatCurrentUser,
+        chatRecipientUser: chatRecipientUser,
       });
     });
   });

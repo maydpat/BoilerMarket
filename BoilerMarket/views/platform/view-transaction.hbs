@@ -25,7 +25,7 @@
 		{{/if}}
 
 		<div class="row">
-            <div class="col-lg-6">
+            <div class="col-xl-6 col-lg-12">
 
                 <!--begin::Portlet-->
                 <div class="m-portlet">
@@ -106,6 +106,53 @@
 
                 <!--end::Portlet-->
             </div>
+
+            <div class="col-xl-6 col-lg-12">
+
+                <!--Begin::Portlet-->
+                <div class="m-portlet  m-portlet--full-height ">
+                    <div class="m-portlet__head">
+                        <div class="m-portlet__head-caption">
+                            <div class="m-portlet__head-title">
+                                <h3 class="m-portlet__head-text">
+                                    Chat
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="m-portlet__body">
+                        <div class="m-form__section m-form__section--first">
+                            <div class="form-group m-form__group">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" placeholder="Send a message" id="sendMessageContent" name="sendMessageContent">
+                                    <input type="hidden"  name="currentUser" id="currentUser" value="{{chatCurrentUser}}">
+                                    <input type="hidden"  name="recipientUser" id="recipientUser" value="{{chatRecipientUser}}">
+                                    <input type="hidden"  name="buyerID" id="buyerID" value="{{transaction.transaction_buyer}}">
+                                    <input type="hidden"  name="sellerID" id="sellerID" value="{{transaction.transaction_seller}}">
+                                    <input type="hidden"  name="transactionID" id="transactionID" value="{{transaction.transaction_id}}">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-primary" id="sendButton">Send</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="m-scrollable" data-scrollable="true" data-height="380" data-mobile-height="300">
+
+                            <!--Begin::Timeline 2 -->
+                            <div class="m-timeline-2">
+                                <div class="m-timeline-2__items  m--padding-top-25 m--padding-bottom-30" id="messages">
+                                </div>
+                            </div>
+
+                            <!--End::Timeline 2 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!--End::Portlet-->
+            </div>
+
+
         </div>
 
 
@@ -145,5 +192,59 @@
 		<!--End::Main Portlet-->
 	</div>
 </div>
+
+<script>
+   var socket = io();
+   function uuidv4() {
+      return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+         (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+      );
+   }
+    $(() => {
+        $("#sendButton").click(()=>{
+            if ($("#sendMessageContent").val() !== '') {
+                sendMessage({currentUser: $("#currentUser").val(), recipientUser: $("#recipientUser").val(), sendMessageContent: $("#sendMessageContent").val(), id: uuidv4(), transaction_id: $("#transactionID").val()});
+            }
+        })
+        getMessages()
+    })
+    socket.on('message', addMessages)
+    //Buyer - <div class="m-timeline-2__item"><span class="m-timeline-2__item-time">Buyer</span><div class="m-timeline-2__item-cricle"><i class="fa fa-genderless m--font-danger"></i></div><div class="m-timeline-2__item-text  m--padding-top-5">HEYHYHEY</div></div>
+    //Seller - <div class="m-timeline-2__item"><span class="m-timeline-2__item-time">Seller</span><div class="m-timeline-2__item-cricle"><i class="fa fa-genderless m--font-success"></i></div><div class="m-timeline-2__item-text  m--padding-top-5">HEYHYHEY</div></div>
+    function addMessages(message){
+       if (((message.sender === $("#currentUser").val() || message.sender === $("#recipientUser").val()) && (message.recipient === $("#currentUser").val() || message.recipient === $("#recipientUser").val())) || (message.currentUser === $("#currentUser").val() && message.recipientUser == $("#recipientUser").val()) || (message.currentUser === $("#recipientUser").val() && message.recipientUser == $("#currentUser").val()) && message.transaction_id === $("#transactionID").val()) {
+           if (message.sender === $("#currentUser").val() && message.sender === $("#buyerID").val()) {
+               $("#messages").append(`<div class="m-timeline-2__item"><span class="m-timeline-2__item-time">Buyer</span><div class="m-timeline-2__item-cricle"><i class="fa fa-genderless m--font-danger"></i></div><div class="m-timeline-2__item-text  m--padding-top-5">${message.content}</div></div>`);
+           } else if (message.sender === $("#currentUser").val() && message.sender === $("#sellerID").val()) {
+               $("#messages").append(`<div class="m-timeline-2__item"><span class="m-timeline-2__item-time">Seller</span><div class="m-timeline-2__item-cricle"><i class="fa fa-genderless m--font-success"></i></div><div class="m-timeline-2__item-text  m--padding-top-5">${message.content}</div></div>`);
+           } else if (message.sender === $("#recipientUser").val() && message.sender === $("#buyerID").val()) {
+               $("#messages").append(`<div class="m-timeline-2__item"><span class="m-timeline-2__item-time">Buyer</span><div class="m-timeline-2__item-cricle"><i class="fa fa-genderless m--font-danger"></i></div><div class="m-timeline-2__item-text  m--padding-top-5">${message.content}</div></div>`);
+           } else if (message.sender === $("#recipientUser").val() && message.sender === $("#sellerID").val()) {
+               $("#messages").append(`<div class="m-timeline-2__item"><span class="m-timeline-2__item-time">Seller</span><div class="m-timeline-2__item-cricle"><i class="fa fa-genderless m--font-success"></i></div><div class="m-timeline-2__item-text  m--padding-top-5">${message.content}</div></div>`);
+           } else if (!message.sender && !message.recipient && !message.message_content && message.currentUser !== $("#currentUser").val() && message.currentUser === $("#buyerID").val()) {
+               $("#messages").prepend(`<div class="m-timeline-2__item"><span class="m-timeline-2__item-time">Buyer</span><div class="m-timeline-2__item-cricle"><i class="fa fa-genderless m--font-danger"></i></div><div class="m-timeline-2__item-text  m--padding-top-5">${message.sendMessageContent}</div></div>`);
+           } else if (!message.sender && !message.recipient && !message.message_content && message.currentUser !== $("#currentUser").val() && message.currentUser === $("#sellerID").val()) {
+               $("#messages").prepend(`<div class="m-timeline-2__item"><span class="m-timeline-2__item-time">Seller</span><div class="m-timeline-2__item-cricle"><i class="fa fa-genderless m--font-success"></i></div><div class="m-timeline-2__item-text  m--padding-top-5">${message.sendMessageContent}</div></div>`);
+           } else if (!message.sender && !message.recipient && !message.message_content && message.currentUser === $("#currentUser").val() && message.currentUser === $("#buyerID").val()) {
+               $("#messages").prepend(`<div class="m-timeline-2__item"><span class="m-timeline-2__item-time">Buyer</span><div class="m-timeline-2__item-cricle"><i class="fa fa-genderless m--font-danger"></i></div><div class="m-timeline-2__item-text  m--padding-top-5">${message.sendMessageContent}</div></div>`);
+           } else if (!message.sender && !message.recipient && !message.message_content && message.currentUser === $("#currentUser").val() && message.currentUser === $("#sellerID").val()) {
+               $("#messages").prepend(`<div class="m-timeline-2__item"><span class="m-timeline-2__item-time">Seller</span><div class="m-timeline-2__item-cricle"><i class="fa fa-genderless m--font-success"></i></div><div class="m-timeline-2__item-text  m--padding-top-5">${message.sendMessageContent}</div></div>`);
+           }
+       }
+    }
+    function getMessages(){
+        let sender = $("#currentUser").val();
+        let recipient = $("#recipientUser").val();
+        let transID = $("#transactionID").val();
+        let path = 'http://localhost:80/chat/messages/?currentUser=' + sender + '&transactionID=' + transID + '&recipientUser=' + recipient;
+      $.get(path, (data) => {
+        data.forEach(addMessages);
+      })
+    }
+    function sendMessage(message){
+      $.post('http://localhost:80/chat/messages', message)
+    }
+
+</script>
 
 {{> footer}}
