@@ -170,7 +170,7 @@ router.get(`/listings/edit/:id`, AuthenticationFunctions.ensureAuthenticated, (r
         con.end();
         req.flash('error', 'Error. Listing not found.');
         return res.redirect('/listings/my-listings');
-      } else if (listings[0].status === 1) {
+      } else if (listings[0].status !== 0) {
         con.end();
         req.flash('error', 'Error. Transaction is on-going. Listing cannot be edited.');
         return res.redirect('/listings/my-listings');
@@ -212,7 +212,7 @@ router.post(`/listings/edit/:id`, AuthenticationFunctions.ensureAuthenticated, (
       con.end();
       req.flash('error', 'Error. Listing not found.');
       return res.redirect('/listings/my-listings');
-    } else if (listings[0].status === 1) {
+    } else if (listings[0].status !== 0) {
       con.end();
       req.flash('error', 'Error. Transaction is on-going. Listing cannot be edited.');
       return res.redirect('/listings/my-listings');
@@ -315,9 +315,18 @@ router.get('/listings/delete/:id', AuthenticationFunctions.ensureAuthenticated, 
           req.flash('error', 'Error.');
           return res.redirect('listings/my-listings');
         }
-        //TODO: Add delete listing
+        con.query(`DELETE FROM listings WHERE id=${mysql.escape(req.params.id)};`, (errorDeletingListing, deleteListingResult, fields) => {
+          if (errorDeletingListing) {
+            console.log(errorDeletingListing);
+            con.end();
+            req.flash('error', 'Error.');
+            return res.redirect('/listings/my-listings')
+          } else {
+            con.end();
+            return res.redirect('/listings/my-listings')
+          }
+        });
       });
-      return res.redirect('/listings/my-listings');
     }
   });
 });
