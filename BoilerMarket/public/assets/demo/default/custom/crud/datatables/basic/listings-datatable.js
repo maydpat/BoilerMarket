@@ -249,6 +249,61 @@ var DatatablesBasicBasic = {
                     return void 0 === s[e] ? e : '<span class="m-badge m-badge--' + s[e].state + ' m-badge--dot"></span>&nbsp;<span class="m--font-bold m--font-' + s[e].state + '">' + s[e].title + "</span>"
                 }
             }]
+        }),
+        (e = $("#view_seller_transactions")).DataTable({
+            responsive: !0,
+            dom: "<'row'<'col-sm-12'tr>>\n\t\t\t<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7 dataTables_pager'lp>>",
+            lengthMenu: [5, 10, 25, 50],
+            pageLength: 10,
+            language: {
+                lengthMenu: "Display _MENU_"
+            },
+            order: [
+                [1, "desc"]
+            ],
+            columnDefs: [{
+                targets: 3,
+                render: function(e, a, t, n) {
+                    var s = {
+                        0: {
+                            title: "Listed",
+                            class: " m-badge--primary"
+                        },
+                        1: {
+                            title: "Complete",
+                            class: " m-badge--success"
+                        },
+                        2: {
+                            title: "Rental Ongoing",
+                            class: " m-badge--primary"
+                        },
+                        3: {
+                            title: "Cancelled",
+                            class: " m-badge--danger"
+                        },
+                        4: {
+                            title: "Pending",
+                            class: " m-badge--primary"
+                        }
+                    };
+                    return void 0 === s[e] ? e : '<span class="m-badge ' + s[e].class + ' m-badge--wide">' + s[e].title + "</span>"
+                }
+            }, {
+                targets: 1,
+                render: function(e, a, t, n) {
+                    var s = {
+                        1: {
+                            title: "Sale",
+                            state: "accent"
+                        },
+                        2: {
+                            title: "Rent",
+                            state: "primary"
+                        }
+                    };
+                    return void 0 === s[e] ? e : '<span class="m-badge m-badge--' + s[e].state + ' m-badge--dot"></span>&nbsp;<span class="m--font-bold m--font-' + s[e].state + '">' + s[e].title + "</span>"
+                }
+            }]
         })
     }
 };

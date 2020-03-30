@@ -262,19 +262,19 @@ router.get('/listings/view/:id', AuthenticationFunctions.ensureAuthenticated, (r
       console.log(findCurrentUserError);
       con.end();
       req.flash('error', 'Error.');
-      return res.redirect('/listings/my-listings');
+      return res.redirect('/listings');
     }
     con.query(`SELECT * FROM listings WHERE id=${mysql.escape(req.params.id)};`, (errorFindingListings, listings, fields) => {
       if (errorFindingListings) {
         console.log(errorFindingListings);
         con.end();
         req.flash('error', 'Error.');
-        return res.redirect('/listings/my-listings');
+        return res.redirect('/listings');
       }
       if (listings.length === 0) {
         con.end();
         req.flash('error', 'Error. Listing not found.');
-        return res.redirect('/listings/my-listings');
+        return res.redirect('/listings');
       } else {
         con.end();
         return res.render('platform/view-listing.hbs', {
@@ -285,6 +285,65 @@ router.get('/listings/view/:id', AuthenticationFunctions.ensureAuthenticated, (r
           error: req.flash('error'),
           success: req.flash('success'),
           listing: listings[0],
+        });
+      }
+    });
+  });
+});
+
+router.get('/listings/view-seller/:listing_id', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+  let con = mysql.createConnection(dbInfo);
+  con.query(`SELECT * FROM users WHERE id=${mysql.escape(req.user.id)};`, (findCurrentUserError, currentUser, fields) => {
+    if (findCurrentUserError) {
+      console.log(findCurrentUserError);
+      con.end();
+      req.flash('error', 'Error.');
+      return res.redirect('/listings');
+    }
+    con.query(`SELECT * FROM listings WHERE id=${mysql.escape(req.params.listing_id)};`, (errorFindingListing, listing, fields) => {
+      if (errorFindingListing) {
+        console.log(errorFindingListing);
+        con.end();
+        req.flash('error', 'Error.');
+        return res.redirect('/listings');
+      }
+      if (listing.length === 0) {
+        con.end();
+        req.flash('error', 'Error. Listing not found.');
+        return res.redirect('/listings');
+      } else if (listing[0].status !== 0) {
+        con.end();
+        req.flash('error', 'Error. Listing has been purchased.');
+        return res.redirect('/listings');
+      } else {
+        con.query(`SELECT transactions.date as 'transaction_date', transactions.status as 'transaction_status', transactions.seller_rating, listings.title as 'listing_title', listings.price as 'listing_price', listings.listing_type FROM transactions JOIN listings ON transactions.listing_id = listings.id WHERE transactions.seller=${mysql.escape(listing[0].listing_owner)} AND (transactions.status=1 OR transactions.status=2 OR transactions.status=5);`, (errorFindingTransactions, transactions, fields) => {
+          if (errorFindingListing) {
+            console.log(errorFindingListing);
+            con.end();
+            req.flash('error', 'Error.');
+            return res.redirect('/listings');
+          }
+          let calculatedRating = 0;
+          if (transactions.length !== 0) {
+            let total = 0;
+            for (let i = 0; i < transactions.length; i++) {
+              calculatedRating += Number(transactions[i].seller_rating);
+              total++;
+            }
+            calculatedRating /= total;
+          }
+          con.end();
+          return res.render('platform/listing-view-seller.hbs', {
+            page_name: `Listing Creator's Past Transactions`,
+            user_first_name: currentUser[0].first_name,
+            user_last_name: currentUser[0].last_name,
+            user_email: currentUser[0].email,
+            error: req.flash('error'),
+            success: req.flash('success'),
+            transactions: transactions,
+            goBackID: req.params.listing_id,
+            calculatedRating: calculatedRating,
+          });
         });
       }
     });

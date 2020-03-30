@@ -264,7 +264,7 @@ router.post(`/transactions/complete`, AuthenticationFunctions.ensureAuthenticate
           req.flash('error', 'Error updating transaction.');
           return res.redirect('/transactions');
         }
-        con.query(`UPDATE listings SET status=${newStatus};`, (errorUpdateListing, updateListingResult, fields) => {
+        con.query(`UPDATE listings SET status=${newStatus} WHERE id=${mysql.escape(transaction[0].listing_id)};`, (errorUpdateListing, updateListingResult, fields) => {
           if(errorUpdateListing) {
             console.log(errorUpdateListing);
             con.end();
