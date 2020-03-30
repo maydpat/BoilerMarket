@@ -242,12 +242,20 @@ router.post(`/transactions/complete`, AuthenticationFunctions.ensureAuthenticate
         if (errorUpdateTransaction) {
           console.log(errorUpdateTransaction);
           con.end();
-          req.flash('error', 'Error updating listing.');
+          req.flash('error', 'Error updating transaction.');
           return res.redirect('/transactions');
         }
-        req.flash(`success`, `Transaction completed.`)
-        con.end();
-        return res.redirect(`/transactions`);
+        con.query(`UPDATE listings SET status=${newStatus};`, (errorUpdateListing, updateListingResult, fields) => {
+          if(errorUpdateListing) {
+            console.log(errorUpdateListing);
+            con.end();
+            req.flash('error', 'Error updating listing.');
+            return res.redirect('/transactions');
+          }
+          req.flash(`success`, `Transaction completed.`)
+          con.end();
+          return res.redirect(`/transactions`);
+        });
       });
     });
   });
