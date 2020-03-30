@@ -78,7 +78,7 @@ router.get(`/cart/add/:id`, AuthenticationFunctions.ensureAuthenticated, (req, r
       con.end();
       req.flash('error', 'Error. Listing not found.');
       return res.redirect('/listings');
-    } else if (listings[0].status === 1) {
+    } else if (listings[0].status !== 0) {
       con.end();
       req.flash('error', 'Error. Listing cannot be added to cart as it is in a transaction.');
       return res.redirect('/listings');
