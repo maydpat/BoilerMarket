@@ -170,7 +170,7 @@ router.get(`/listings/edit/:id`, AuthenticationFunctions.ensureAuthenticated, (r
         con.end();
         req.flash('error', 'Error. Listing not found.');
         return res.redirect('/listings/my-listings');
-      } else if (listings[0].status === 1) {
+      } else if (listings[0].status !== 0) {
         con.end();
         req.flash('error', 'Error. Transaction is on-going. Listing cannot be edited.');
         return res.redirect('/listings/my-listings');
@@ -212,7 +212,7 @@ router.post(`/listings/edit/:id`, AuthenticationFunctions.ensureAuthenticated, (
       con.end();
       req.flash('error', 'Error. Listing not found.');
       return res.redirect('/listings/my-listings');
-    } else if (listings[0].status === 1) {
+    } else if (listings[0].status !== 0) {
       con.end();
       req.flash('error', 'Error. Transaction is on-going. Listing cannot be edited.');
       return res.redirect('/listings/my-listings');
@@ -288,6 +288,46 @@ router.get('/listings/view/:id', AuthenticationFunctions.ensureAuthenticated, (r
         });
       }
     });
+  });
+});
+
+router.get('/listings/delete/:id', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+  let con = mysql.createConnection(dbInfo);
+  con.query(`SELECT * FROM listings WHERE id=${mysql.escape(req.params.id)} AND listing_owner=${mysql.escape(req.user.id)};`, (errorFindingListings, listings, fields) => {
+    if (errorFindingListings) {
+      console.log(errorFindingListings);
+      con.end();
+      req.flash('error', 'Error.');
+      return res.redirect('/listings/my-listings');
+    }
+    if (listings.length === 0) {
+      con.end();
+      req.flash('error', 'Error. Listing not found.');
+      return res.redirect('/listings/my-listings');
+    } else if (listings[0].status !== 0) {
+      con.end();
+      req.flash('error', 'A transaction has already or is currently occurring with this item.');
+    } else {
+      con.query(`DELETE FROM cart WHERE listing_id=${mysql.escape(req.params.id)};`, (errorRemovingFromCarts, removeListingFromCartsResult, fields)  => {
+        if (errorRemovingFromCarts) {
+          console.log(errorRemovingFromCarts);
+          con.end();
+          req.flash('error', 'Error.');
+          return res.redirect('listings/my-listings');
+        }
+        con.query(`DELETE FROM listings WHERE id=${mysql.escape(req.params.id)};`, (errorDeletingListing, deleteListingResult, fields) => {
+          if (errorDeletingListing) {
+            console.log(errorDeletingListing);
+            con.end();
+            req.flash('error', 'Error.');
+            return res.redirect('/listings/my-listings')
+          } else {
+            con.end();
+            return res.redirect('/listings/my-listings')
+          }
+        });
+      });
+    }
   });
 });
 
