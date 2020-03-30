@@ -192,11 +192,19 @@ router.get(`/transactions/cancel/:id`, AuthenticationFunctions.ensureAuthenticat
             console.log(errorUpdateTransaction);
             con.end();
             req.flash('error', 'Error updating transaction.');
-            return res.redirect('/transactions');
+            return res.redirect(`/transactions/view/${req.params.id}`);
           }
-          req.flash(`success`, `Transaction has been cancelled.`)
-          con.end();
-          return res.redirect(`/transactions`);
+          con.query(`UPDATE listings SET status=3 WHERE id=${mysql.escape(transaction[0].listing_id)};`, (errorUpdateListing, updateListingResult, fields) => {
+            if (errorUpdateListing) {
+              console.log(errorUpdateListing);
+              con.end();
+              req.flash('error', 'Error updating listing.');
+              return res.redirect(`/transactions/view/${req.params.id}`);
+            }
+            req.flash(`success`, `Transaction has been cancelled.`)
+            con.end();
+            return res.redirect(`/transactions/view/${req.params.id}`);
+          });
         });
       } else {
         con.query(`UPDATE transactions SET buyer_cancel=${buyerCancel}, seller_cancel=${sellerCancel} WHERE id=${mysql.escape(req.params.id)};`, (errorUpdateTransaction, updateTransactionResult, fields) => {
@@ -204,7 +212,7 @@ router.get(`/transactions/cancel/:id`, AuthenticationFunctions.ensureAuthenticat
             console.log(errorUpdateTransaction);
             con.end();
             req.flash('error', 'Error updating transaction.');
-            return res.redirect('/transactions');
+            return res.redirect(`/transactions/view/${req.params.id}`);
           }
           con.end();
           return res.redirect(`/transactions/view/${req.params.id}`);
