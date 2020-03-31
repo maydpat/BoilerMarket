@@ -272,13 +272,15 @@
         let sender = $("#currentUser").val();
         let recipient = $("#recipientUser").val();
         let transID = $("#transactionID").val();
-        let path = 'http://localhost:80/chat/messages/?currentUser=' + sender + '&transactionID=' + transID + '&recipientUser=' + recipient;
+        //let path = 'http://localhost:80/chat/messages/?currentUser=' + sender + '&transactionID=' + transID + '&recipientUser=' + recipient;
+        let path = 'http://34.68.115.37/chat/messages/?currentUser=' + sender + '&transactionID=' + transID + '&recipientUser=' + recipient;
       $.get(path, (data) => {
         data.forEach(addMessages);
       })
     }
     function sendMessage(message){
-      $.post('http://localhost:80/chat/messages', message)
+      //$.post('http://localhost:80/chat/messages', message)
+      $.post('http://34.68.115.37/chat/messages', message)
     }
 
 </script>
