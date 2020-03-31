@@ -43,6 +43,10 @@ var DatatablesBasicBasic = {
                         4: {
                             title: "Pending",
                             class: " m-badge--primary"
+                        }, 
+                        5: {
+                            title: "In Dispute",
+                            class: " m-badge--danger"
                         }
                     };
                     return void 0 === s[e] ? e : '<span class="m-badge ' + s[e].class + ' m-badge--wide">' + s[e].title + "</span>"
@@ -105,6 +109,10 @@ var DatatablesBasicBasic = {
                         4: {
                             title: "Pending",
                             class: " m-badge--primary"
+                        }, 
+                        5: {
+                            title: "In Dispute",
+                            class: " m-badge--danger"
                         }
                     };
                     return void 0 === s[e] ? e : '<span class="m-badge ' + s[e].class + ' m-badge--wide">' + s[e].title + "</span>"
@@ -167,6 +175,10 @@ var DatatablesBasicBasic = {
                         4: {
                             title: "Pending",
                             class: " m-badge--primary"
+                        }, 
+                        5: {
+                            title: "In Dispute",
+                            class: " m-badge--danger"
                         }
                     };
                     return void 0 === s[e] ? e : '<span class="m-badge ' + s[e].class + ' m-badge--wide">' + s[e].title + "</span>"
@@ -229,6 +241,10 @@ var DatatablesBasicBasic = {
                         4: {
                             title: "Pending",
                             class: " m-badge--primary"
+                        }, 
+                        5: {
+                            title: "In Dispute",
+                            class: " m-badge--danger"
                         }
                     };
                     return void 0 === s[e] ? e : '<span class="m-badge ' + s[e].class + ' m-badge--wide">' + s[e].title + "</span>"
@@ -284,6 +300,10 @@ var DatatablesBasicBasic = {
                         4: {
                             title: "Pending",
                             class: " m-badge--primary"
+                        }, 
+                        5: {
+                            title: "In Dispute",
+                            class: " m-badge--danger"
                         }
                     };
                     return void 0 === s[e] ? e : '<span class="m-badge ' + s[e].class + ' m-badge--wide">' + s[e].title + "</span>"

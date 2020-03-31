@@ -96,6 +96,10 @@ router.get(`/transactions/view/:id`, AuthenticationFunctions.ensureAuthenticated
       showCancelButton = isTransactionNotComplete && (cancelButtonSellerCase || cancelButtonBuyerCase)
       /* END - Show 'Cancel' Button Logic */
 
+      /* Show 'Dispute' Button Logic */
+      showDisputeButton = isTransactionNotComplete && isBuyer && (transaction[0].buyer_cancel === 0 || isNotCanceled);
+      /* END - Show 'Dispute' Button Logic */
+
       /* Show Cancel Message Alert */
       let showCancelMessage = null;
       if (transaction[0].transaction_status === 3) {
@@ -134,6 +138,7 @@ router.get(`/transactions/view/:id`, AuthenticationFunctions.ensureAuthenticated
         showCancelMessage: showCancelMessage,
         showCompleteButton: showCompleteButton,
         showCancelButton: showCancelButton,
+        showDisputeButton: showDisputeButton,
         chatCurrentUser: chatCurrentUser,
         chatRecipientUser: chatRecipientUser,
       });
@@ -277,6 +282,63 @@ router.post(`/transactions/complete`, AuthenticationFunctions.ensureAuthenticate
         });
       });
     });
+  });
+});
+
+router.post(`/transactions/open-dispute`, AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+  req.checkBody('seller_rating', 'Seller rating is required.').notEmpty();
+  req.checkBody('dispute_reason', 'Dispute reason is required.').notEmpty();
+  let formErrors = req.validationErrors();
+  if (formErrors) {
+    req.flash('error', formErrors[0].msg);
+    return res.redirect(`/transactions/view/${req.body.transaction_id}`);
+  }
+  let con = mysql.createConnection(dbInfo);
+  con.query(`SELECT * FROM transactions WHERE id=${mysql.escape(req.body.transaction_id)};`, (errorFindingTransaction, transaction, fields) => {
+    if (errorFindingTransaction) {
+      console.log(errorFindingTransaction);
+      con.end();
+      req.flash('error', 'Error.');
+      return res.redirect(`/transactions/view/${req.body.transaction_id}`);
+    }
+    if (transaction.length !== 0) {
+      if (transaction[0].status === 3) {
+        con.end();
+        req.flash('error', 'Error. Transaction cannot be escalated to a dispute as it has been cancelled.');
+        return res.redirect(`/transactions/view/${req.body.transaction_id}`);
+      } else if (transaction[0].status === 1 || transaction[0].status === 2) {
+        con.end();
+        req.flash('error', 'Error. Transaction cannot be escalated to a dispute as it has been completed.');
+        return res.redirect(`/transactions/view/${req.body.transaction_id}`);
+      }
+      con.query(`INSERT INTO disputes (id, transaction_id, reason, status) VALUES (${mysql.escape(uuidv4())}, ${mysql.escape(req.body.transaction_id)}, ${mysql.escape(req.body.dispute_reason)}, 0);`, (errorInsertingDispute, insertDisputeResult, fields) => {
+        if (errorInsertingDispute) {
+          console.log(errorInsertingDispute);
+          con.end();
+          req.flash('error', 'Error.');
+          return res.redirect(`/transactions/view/${req.body.transaction_id}`);
+        }
+        con.query(`UPDATE transactions SET status=5, seller_rating=${mysql.escape(Number(req.body.seller_rating))} WHERE id=${mysql.escape(req.body.transaction_id)};`, (errorUpdatingTransaction, updateTransactionResult, fields) => {
+          if (errorUpdatingTransaction) {
+            console.log(errorUpdatingTransaction);
+            con.end();
+            req.flash('error', 'Error.');
+            return res.redirect(`/transactions/view/${req.body.transaction_id}`);
+          }
+          con.query(`UPDATE listings SET status=5 WHERE id=${mysql.escape(transaction[0].listing_id)};`, (errorUpdatingListing, updateListingResult, fields) => {
+            if (errorUpdatingListing) {
+              console.log(errorUpdatingListing);
+              con.end();
+              req.flash('error', 'Error.');
+              return res.redirect(`/transactions/view/${req.body.transaction_id}`);
+            }
+            con.end();
+            req.flash('success', 'Escalated to a dispute.');
+            return res.redirect(`/transactions/view/${req.body.transaction_id}`);
+          });
+        });
+      });
+    }
   });
 });
 

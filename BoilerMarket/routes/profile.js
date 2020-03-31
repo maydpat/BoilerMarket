@@ -43,7 +43,6 @@ router.get('/profile', AuthenticationFunctions.ensureAuthenticated, (req, res) =
             success: req.flash('success'),
             page_name: 'My Profile',
             user_email: users[0].email,
-            user_paypal_email: users[0].paypal_email,
             user_phone_number: users[0].phone_number,
             user_location: users[0].location,
             user_first_name: users[0].first_name,
@@ -57,7 +56,6 @@ router.post('/profile/update-profile', AuthenticationFunctions.ensureAuthenticat
     req.checkBody('email', 'Email field is required.').notEmpty();
     req.checkBody('phone_number', 'Phone Number field is required.').notEmpty();
     req.checkBody('location', 'Location (ZIP) field is required.').notEmpty();
-    req.checkBody('paypal_email', 'PayPal field is required.').notEmpty();
     let formErrors = req.validationErrors();
     if (formErrors) {
         req.flash('error', formErrors[0].msg);
@@ -82,7 +80,7 @@ router.post('/profile/update-profile', AuthenticationFunctions.ensureAuthenticat
             req.flash('error', 'Incorrect Password entered.');
             return res.redirect('/profile');
         }
-        con.query(`UPDATE users SET phone_number=${mysql.escape(req.body.phone_number)}, location=${mysql.escape(req.body.location)}, email=${mysql.escape(req.body.email)}, paypal_email=${mysql.escape(req.body.paypal_email)}, two_factor=${mysql.escape(Number(req.body.two_factor))} WHERE id=${mysql.escape(req.user.id)};`, (updateUserError, results, fields) => {
+        con.query(`UPDATE users SET phone_number=${mysql.escape(req.body.phone_number)}, location=${mysql.escape(req.body.location)}, email=${mysql.escape(req.body.email)}, two_factor=${mysql.escape(Number(req.body.two_factor))} WHERE id=${mysql.escape(req.user.id)};`, (updateUserError, results, fields) => {
             if (updateUserError) {
                 con.end();
                 console.log(updateUserError);

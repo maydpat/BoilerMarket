@@ -42,7 +42,6 @@ router.post('/register', AuthenticationFunctions.ensureNotAuthenticated, (req, r
     req.checkBody('phone_number', 'Phone Number field is required.').notEmpty();
     req.checkBody('location', 'Location (ZIP CODE) field is required.').notEmpty();
     req.checkBody('email', 'Email field is required.').notEmpty();
-    req.checkBody('paypal_email', 'PayPal Email field is required.').notEmpty();
     req.checkBody('password', 'Password field is required.').notEmpty();
     req.checkBody('password_confirm', 'Confirm password field is required.').notEmpty();
     req.checkBody('password_confirm', 'Password does not match confirmation password field.').equals(req.body.password);
@@ -76,7 +75,7 @@ router.post('/register', AuthenticationFunctions.ensureNotAuthenticated, (req, r
     let salt = bcrypt.genSaltSync(10);
     let hashedPassword = bcrypt.hashSync(req.body.password, salt);
     let con = mysql.createConnection(dbInfo);
-    con.query( `INSERT INTO users (id, email, paypal_email, password, first_name, last_name, phone_number, location) VALUES (${mysql.escape(uuidv4())}, ${mysql.escape(req.body.email)}, ${mysql.escape(req.body.paypal_email)}, ${mysql.escape(hashedPassword)}, ${mysql.escape(req.body.first_name)}, ${mysql.escape(req.body.last_name)}, ${mysql.escape(req.body.phone_number)}, ${mysql.escape(req.body.location)});`, (insertUserError, fields, results) => {
+    con.query( `INSERT INTO users (id, email, password, first_name, last_name, phone_number, location) VALUES (${mysql.escape(uuidv4())}, ${mysql.escape(req.body.email)}, ${mysql.escape(hashedPassword)}, ${mysql.escape(req.body.first_name)}, ${mysql.escape(req.body.last_name)}, ${mysql.escape(req.body.phone_number)}, ${mysql.escape(req.body.location)});`, (insertUserError, fields, results) => {
         if (insertUserError) {
             console.log(insertUserError);
             con.end();
