@@ -4,6 +4,14 @@ var register = function(Handlebars) {
         return options.fn(this).replace(
             new RegExp(' value=\"' + value + '\"'),
             '$& selected="selected"');
+    },
+    isAdminHelper: function(data) {
+        if (Number(data) === 0) {
+            return false;
+        } else {
+            console.log('true');
+            return true;
+        }
     }
 };
 

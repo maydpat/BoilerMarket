@@ -199,8 +199,10 @@
 								</li>
 								<li class="m-menu__item " aria-haspopup="true"><a href="/transactions" class="m-menu__link "><i class="m-menu__link-icon flaticon-shopping-basket"></i><span class="m-menu__link-title"> <span class="m-menu__link-wrap"> <span class="m-menu__link-text">Transactions</span></a>
 								</li>
+								{{#if (isAdminHelper user_is_admin)}}
 								<li class="m-menu__item " aria-haspopup="true"><a href="/admin/" class="m-menu__link "><i class="m-menu__link-icon flaticon-shopping-basket"></i><span class="m-menu__link-title"> <span class="m-menu__link-wrap"> <span class="m-menu__link-text">Admin</span></a>
 								</li>
+								{{/if}}
 							</ul>
 						</div>
 

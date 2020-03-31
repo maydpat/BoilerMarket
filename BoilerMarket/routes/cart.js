@@ -60,6 +60,7 @@ router.get('/cart', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
         user_first_name: currentUser[0].first_name,
         user_last_name: currentUser[0].last_name,
         user_email: currentUser[0].email,
+        user_is_admin: req.user.is_admin,
       });
     });
   });

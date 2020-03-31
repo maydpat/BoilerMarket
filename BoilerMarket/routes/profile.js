@@ -48,6 +48,7 @@ router.get('/profile', AuthenticationFunctions.ensureAuthenticated, (req, res) =
             user_first_name: users[0].first_name,
             user_last_name: users[0].last_name,
             user_two_factor: users[0].two_factor,
+            user_is_admin: req.user.is_admin,
         });
     });
 });

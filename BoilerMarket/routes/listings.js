@@ -54,6 +54,7 @@ router.get('/listings', AuthenticationFunctions.ensureAuthenticated, (req, res) 
         user_first_name: currentUser[0].first_name,
         user_last_name: currentUser[0].last_name,
         user_email: currentUser[0].email,
+        user_is_admin: req.user.is_admin,
         listings: listings
       });
     });
@@ -75,6 +76,7 @@ router.get('/listings/create-listing', AuthenticationFunctions.ensureAuthenticat
       user_first_name: currentUser[0].first_name,
       user_last_name: currentUser[0].last_name,
       user_email: currentUser[0].email,
+      user_is_admin: req.user.is_admin,
       error: req.flash('error'),
       success: req.flash('success'),
     });
@@ -142,6 +144,7 @@ router.get('/listings/my-listings', AuthenticationFunctions.ensureAuthenticated,
         user_first_name: currentUser[0].first_name,
         user_last_name: currentUser[0].last_name,
         user_email: currentUser[0].email,
+        user_is_admin: req.user.is_admin,
         error: req.flash('error'),
         success: req.flash('success'),
         userListings: userListings,
@@ -181,6 +184,7 @@ router.get(`/listings/edit/:id`, AuthenticationFunctions.ensureAuthenticated, (r
           user_first_name: currentUser[0].first_name,
           user_last_name: currentUser[0].last_name,
           user_email: currentUser[0].email,
+          user_is_admin: req.user.is_admin,
           error: req.flash('error'),
           success: req.flash('success'),
           listing: listings[0],
@@ -282,6 +286,7 @@ router.get('/listings/view/:id', AuthenticationFunctions.ensureAuthenticated, (r
           user_first_name: currentUser[0].first_name,
           user_last_name: currentUser[0].last_name,
           user_email: currentUser[0].email,
+          user_is_admin: req.user.is_admin,
           error: req.flash('error'),
           success: req.flash('success'),
           listing: listings[0],
@@ -338,6 +343,7 @@ router.get('/listings/view-seller/:listing_id', AuthenticationFunctions.ensureAu
             user_first_name: currentUser[0].first_name,
             user_last_name: currentUser[0].last_name,
             user_email: currentUser[0].email,
+            user_is_admin: req.user.is_admin,
             error: req.flash('error'),
             success: req.flash('success'),
             transactions: transactions,
