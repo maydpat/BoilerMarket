@@ -43,6 +43,7 @@ const forgotPasswordRoute = require('./routes/forgot-password');
 const transactionsRoute = require('./routes/transactions');
 const checkoutRoute = require('./routes/checkout');
 const chatRoute = require('./routes/chat');
+const adminRoute = require('./routes/admin');
 
 // Static folder
 app.use(express.static(path.join(__dirname, '/public')));
@@ -82,6 +83,7 @@ app.use('/', forgotPasswordRoute);
 app.use('/', transactionsRoute);
 app.use('/', checkoutRoute);
 app.use('/', chatRoute);
+app.use('/admin/', adminRoute);
 
 server.listen(port, () =>{
   console.log(`Server started on port ${port}`);

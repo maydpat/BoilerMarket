@@ -14,5 +14,10 @@ module.exports = {
     next();
   },
 
+  ensureAdmin: function(req, res, next) {
+    if (req.user.is_admin === 0) { return res.redirect('/dashboard'); }
+    next();
+  },
+
 
 }

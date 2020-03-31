@@ -134,6 +134,7 @@ async function (req, username, password, done) {
                                 phone_number: users[0].phone_number,
                                 location: users[0].location,
                                 id: users[0].id,
+                                is_admin: users[0].admin,
                             };
                             return done(null, userObj);
                         }
@@ -157,6 +158,7 @@ async function (req, username, password, done) {
                     phone_number: users[0].phone_number,
                     location: users[0].location,
                     id: users[0].id,
+                    is_admin: users[0].admin,
                 };
                 return done(null, userObj);
             }
