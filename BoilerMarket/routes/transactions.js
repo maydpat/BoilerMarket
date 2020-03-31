@@ -18,6 +18,7 @@ const nodemailer = require('nodemailer');
 
 const LocalStrategy = require('passport-local').Strategy;
 const AuthenticationFunctions = require('../Functions/Authentication.js');
+const TransactionFunctions = require('../Functions/Transactions.js');
 
 let dbInfo = {
     connectionLimit: 100,
@@ -208,6 +209,8 @@ router.get(`/transactions/cancel/:id`, AuthenticationFunctions.ensureAuthenticat
               req.flash('error', 'Error updating listing.');
               return res.redirect(`/transactions/view/${req.params.id}`);
             }
+            TransactionFunctions.email_cancelTransaction(transaction[0].buyer, transaction[0].listing_id);
+            TransactionFunctions.email_cancelTransaction(transaction[0].seller, transaction[0].listing_id);
             req.flash(`success`, `Transaction has been cancelled.`)
             con.end();
             return res.redirect(`/transactions/view/${req.params.id}`);
@@ -278,6 +281,8 @@ router.post(`/transactions/complete`, AuthenticationFunctions.ensureAuthenticate
             req.flash('error', 'Error updating listing.');
             return res.redirect('/transactions');
           }
+          TransactionFunctions.email_completeTransaction(transaction[0].buyer, listing[0].title);
+          TransactionFunctions.email_completeTransaction(transaction[0].seller, listing[0].title);
           req.flash(`success`, `Transaction completed.`)
           con.end();
           return res.redirect(`/transactions`);
@@ -334,6 +339,8 @@ router.post(`/transactions/open-dispute`, AuthenticationFunctions.ensureAuthenti
               req.flash('error', 'Error.');
               return res.redirect(`/transactions/view/${req.body.transaction_id}`);
             }
+            TransactionFunctions.email_openDispute(transaction[0].buyer, transaction[0]);
+            TransactionFunctions.email_openDispute(transaction[0].seller, transaction[0]);
             con.end();
             req.flash('success', 'Escalated to a dispute.');
             return res.redirect(`/transactions/view/${req.body.transaction_id}`);

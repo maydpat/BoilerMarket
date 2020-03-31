@@ -9,7 +9,6 @@ var register = function(Handlebars) {
         if (Number(data) === 0) {
             return false;
         } else {
-            console.log('true');
             return true;
         }
     }

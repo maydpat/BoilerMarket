@@ -18,6 +18,7 @@ const nodemailer = require('nodemailer');
 
 const LocalStrategy = require('passport-local').Strategy;
 const AuthenticationFunctions = require('../Functions/Authentication.js');
+const TransactionFunctions = require('../Functions/Transactions.js');
 
 let dbInfo = {
     connectionLimit: 100,
@@ -103,6 +104,8 @@ router.get(`/checkout/transact/:id`, AuthenticationFunctions.ensureAuthenticated
               req.flash('error', "Error.");
               return res.redirect('/cart');
             }
+            TransactionFunctions.email_createTransaction(cartListings[0].buyer, cartListings[0].title);
+            TransactionFunctions.email_createTransaction(cartListings[0].seller, cartListings[0].title);
             req.flash('success', "Transaction Created.");
             con.end();
             return res.redirect(`/transactions/view/${transactionID}`);
