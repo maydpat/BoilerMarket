@@ -88,6 +88,43 @@ router.get('/users', AuthenticationFunctions.ensureAuthenticated, Authentication
     });
 });
 
+router.get('/analytics', AuthenticationFunctions.ensureAuthenticated, AuthenticationFunctions.ensureAdmin, (req, res) => {
+    let con = mysql.createConnection(dbInfo);
+    con.query(`SELECT * FROM listings;`, (findListingsError, listings, fields) => {
+        if (findListingsError) {
+            con.end();
+            req.flash('error', 'Error.');
+            return res.redirect('/dashboard');
+        }
+
+        averagePrice = 0
+        listedItemsCount = 0
+        itemsSold = 0
+
+        allListingsCount = listings.length
+
+        for (i in listings) {
+            averagePrice += listings[i].price
+            if (listings[i].status == 0) {
+                listedItemsCount += 1
+            } else if (listings[i].status == 1) {
+                itemsSold += 1
+            }
+        }
+        averagePrice /= allListingsCount
+
+        con.end();
+        return res.render('platform/admin/analytics.hbs', {
+            error: req.flash('error'),
+            success: req.flash('success'),
+            page_name: 'Analytics',
+            averagePrice: averagePrice,
+            listedItemsCount: listedItemsCount,
+            itemsSold: itemsSold
+        });
+    });
+});
+
 router.get('/view-user/:user_id', AuthenticationFunctions.ensureAuthenticated, AuthenticationFunctions.ensureAdmin, (req, res) => {
     let con = mysql.createConnection(dbInfo);
     con.query(`SELECT * FROM users WHERE id=${mysql.escape(req.user.id)};`, (findUserError, currentUser, fields) => {
