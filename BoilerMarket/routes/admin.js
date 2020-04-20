@@ -100,6 +100,8 @@ router.get('/analytics', AuthenticationFunctions.ensureAuthenticated, Authentica
         averagePrice = 0
         listedItemsCount = 0
         itemsSold = 0
+        cancelledTransactions = 0
+        pendingTransactions = 0
 
         allListingsCount = listings.length
 
@@ -109,18 +111,46 @@ router.get('/analytics', AuthenticationFunctions.ensureAuthenticated, Authentica
                 listedItemsCount += 1
             } else if (listings[i].status == 1) {
                 itemsSold += 1
+            } else if (listings[i].status == 3) {
+                cancelledTransactions += 1
+            } else if (listings[i].status == 4) {
+                pendingTransactions += 1
             }
         }
         averagePrice /= allListingsCount
+        averagePrice = averagePrice.toFixed(2)
+        cancelledTransactions *= 10
 
-        con.end();
-        return res.render('platform/admin/analytics.hbs', {
-            error: req.flash('error'),
-            success: req.flash('success'),
-            page_name: 'Analytics',
-            averagePrice: averagePrice,
-            listedItemsCount: listedItemsCount,
-            itemsSold: itemsSold
+        con.query(`SELECT * FROM transactions;`, (findTransactionsError, transactions, fields) => {
+            if (findTransactionsError) {
+                con.end();
+                req.flash('error', 'Error.');
+                return res.redirect('/dashboard');
+            }
+
+            con.query(`SELECT * FROM disputes;`, (findDisputesError, disputes, fields) => {
+                if (findDisputesError) {
+                    con.end();
+                    req.flash('error', 'Error.');
+                    return res.redirect('/dashboard');
+                }
+
+                numDisputes = disputes.length
+                disputeRatio = numDisputes * 10 / transactions.length
+
+                con.end();
+                return res.render('platform/admin/analytics.hbs', {
+                    error: req.flash('error'),
+                    success: req.flash('success'),
+                    page_name: 'Analytics',
+                    averagePrice: averagePrice,
+                    listedItemsCount: listedItemsCount,
+                    itemsSold: itemsSold,
+                    cancelledTransactions: cancelledTransactions,
+                    pendingTransactions: pendingTransactions,
+                    disputeRatio: disputeRatio
+                });
+            });
         });
     });
 });
