@@ -183,6 +183,27 @@ router.post(`/change-user-password/:user_id`, AuthenticationFunctions.ensureAuth
     });
 });
 
+router.get('/transactions', AuthenticationFunctions.ensureAuthenticated, AuthenticationFunctions.ensureAdmin, (req, res) => {
+    let con = mysql.createConnection(dbInfo);
+    con.query(`SELECT transactions.id, transactions.status, listings.title, listings.description, listings.price, listings.listing_type, transactions.date, transactions.buyer, transactions.seller FROM transactions JOIN listings ON transactions.listing_id = listings.id;`, (errorGettingTransactions, transactions, fields) => {
+        if (errorGettingTransactions) {
+            console.log(errorGettingTransactions);
+            con.end();
+            req.flash('error', 'Error.');
+            return res.redirect('/admin/dashboard');
+        }
+        console.log(transactions)
+
+        con.end();
+        return res.render('platform/admin/users.hbs', {
+            error: req.flash('error'),
+            success: req.flash('success'),
+            page_name: 'BoilerMarket Transactions',
+            transactions: transactions,
+        });
+    });
+});
+
 
 
 
