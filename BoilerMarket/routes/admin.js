@@ -204,6 +204,94 @@ router.get('/transactions', AuthenticationFunctions.ensureAuthenticated, Authent
     });
 });
 
+router.get(`/transactions/view/:id`, AuthenticationFunctions.ensureAuthenticated, (req, res) => {
+  let con = mysql.createConnection(dbInfo);
+  con.query(`SELECT * FROM users WHERE id=${mysql.escape(req.user.id)};`, (findCurrentUserError, currentUser, fields) => {
+    if (findCurrentUserError) {
+      console.log(findCurrentUserError);
+      con.end();
+      req.flash('error', 'Error.');
+      return res.redirect('/transactions');
+    }
+    con.query(`SELECT transactions.buyer_cancel, transactions.seller_cancel, transactions.status as 'transaction_status', transactions.id as 'transaction_id', listings.id as 'listing_id', transactions.date as 'transaction_date', listings.price as 'transaction_price', listings.title as 'listing_title', listings.description as 'listing_description', listings.listing_type, listings.duration as 'rent_duration', transactions.buyer as 'transaction_buyer', transactions.seller as 'transaction_seller' FROM transactions JOIN listings ON transactions.listing_id = listings.id WHERE transactions.id=${mysql.escape(req.params.id)};`, (errorFindingTransaction, transaction, fields) => {
+      if (errorFindingTransaction) {
+        console.log(errorFindingTransaction);
+        con.end();
+        req.flash('error', 'Error.');
+        return res.redirect('/transactions');
+      }
+      if (transaction.length === 0) {
+        con.end();
+        req.flash('error', 'Error. Transaction not found.');
+        return res.redirect('/transactions');
+      }
+      con.end();
+      
+      /* Show 'Mark as Complete' Button Logic */
+      isBuyer = (req.user.id === transaction[0].transaction_buyer)
+      isPending = (transaction[0].transaction_status === 4)
+      isNotCanceled = (transaction[0].buyer_cancel === 0 && transaction[0].seller_cancel === 0)
+      showCompleteButton = isBuyer && isPending && isNotCanceled
+      /* END - Show 'Mark as Complete' Button Logic */
+
+      /* Show 'Cancel' Button Logic */
+      cancelButtonSellerCase = transaction[0].seller_cancel !== 1 && req.user.id === transaction[0].transaction_seller
+      cancelButtonBuyerCase = transaction[0].buyer_cancel !== 1 && req.user.id === transaction[0].transaction_buyer
+      isTransactionNotComplete = transaction[0].transaction_status === 4
+      showCancelButton = isTransactionNotComplete && (cancelButtonSellerCase || cancelButtonBuyerCase)
+      /* END - Show 'Cancel' Button Logic */
+
+      /* Show 'Dispute' Button Logic */
+      showDisputeButton = isTransactionNotComplete && isBuyer && (transaction[0].buyer_cancel === 0 || isNotCanceled);
+      /* END - Show 'Dispute' Button Logic */
+
+      /* Show Cancel Message Alert */
+      let showCancelMessage = null;
+      if (transaction[0].transaction_status === 3) {
+        showCancelMessage = "This transaction has been cancelled.";
+      } else {
+        if (transaction[0].buyer_cancel === 1) {
+          if (req.user.id === transaction[0].transaction_buyer) {
+            showCancelMessage = "You've requested to cancel the transaction. Awaiting seller response.";
+          } else {
+            showCancelMessage = "Buyer requested to cancel the transaction. Awaiting your response.";
+          }
+        } else if (transaction[0].seller_cancel === 1) {
+          if (req.user.id === transaction[0].transaction_seller) {
+            showCancelMessage = "You've requested to cancel the transaction. Awaiting buyer response.";
+          } else {
+            showCancelMessage = "Seller requested to cancel the transaction. Awaiting your response.";
+          }
+        }
+      }
+      /* END - Show Cancel Message Alert */
+
+      /* Obtain chatCurrentUser & chatRecipient values */
+      let chatCurrentUser = req.user.id;
+      let chatRecipientUser = 0;
+      if (transaction[0].transaction_buyer !== req.user.id) chatRecipientUser = transaction[0].transaction_buyer;
+      else chatRecipientUser = transaction[0].transaction_seller;
+      /* END - Obtain BuyerID & Seller ID */
+      return res.render('platform/view-transaction.hbs', {
+        page_name: 'View Transaction',
+        user_first_name: currentUser[0].first_name,
+        user_last_name: currentUser[0].last_name,
+        user_email: currentUser[0].email,
+        user_is_admin: req.user.is_admin,
+        error: req.flash('error'),
+        success: req.flash('success'),
+        transaction: transaction[0],
+        showCancelMessage: showCancelMessage,
+        showCompleteButton: showCompleteButton,
+        showCancelButton: showCancelButton,
+        showDisputeButton: showDisputeButton,
+        chatCurrentUser: chatCurrentUser,
+        chatRecipientUser: chatRecipientUser,
+      });
+    });
+  });
+});
+
 
 
 
