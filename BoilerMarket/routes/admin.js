@@ -100,6 +100,7 @@ router.get('/analytics', AuthenticationFunctions.ensureAuthenticated, Authentica
         averagePrice = 0
         listedItemsCount = 0
         itemsSold = 0
+        totalRevenue = 0
         cancelledTransactions = 0
         pendingTransactions = 0
 
@@ -111,6 +112,7 @@ router.get('/analytics', AuthenticationFunctions.ensureAuthenticated, Authentica
                 listedItemsCount += 1
             } else if (listings[i].status == 1) {
                 itemsSold += 1
+                totalRevenue += listings[i].price
             } else if (listings[i].status == 3) {
                 cancelledTransactions += 1
             } else if (listings[i].status == 4) {
@@ -146,6 +148,7 @@ router.get('/analytics', AuthenticationFunctions.ensureAuthenticated, Authentica
                     averagePrice: averagePrice,
                     listedItemsCount: listedItemsCount,
                     itemsSold: itemsSold,
+                    totalRevenue: totalRevenue,
                     cancelledTransactions: cancelledTransactions,
                     pendingTransactions: pendingTransactions,
                     disputeRatio: disputeRatio
