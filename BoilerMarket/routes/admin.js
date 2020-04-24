@@ -183,6 +183,21 @@ router.post(`/change-user-password/:user_id`, AuthenticationFunctions.ensureAuth
     });
 });
 
+router.post(`/ban-user/:user_id`, AuthenticationFunctions.ensureAuthenticated, AuthenticationFunctions.ensureAdmin, (req, res) => {
+    let con = mysql.createConnection(dbInfo);
+    con.query(`UPDATE users SET ban=1 WHERE id=${mysql.escape(req.params.user_id)};`, (errorBanningUser, updateUserResult, fields) => {
+        if (errorBanningUser) {
+            console.log(errorBanningUser);
+            con.end();
+            req.flash('error', 'Error banning user.');
+            return res.redirect(`/admin/view-user/${req.params.user_id}`);
+        }
+        con.end();
+        req.flash('success', 'Successfully banned user.');
+        return res.redirect(`/admin/view-user/${req.params.user_id}`);
+    });
+});
+
 
 
 
