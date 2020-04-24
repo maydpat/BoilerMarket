@@ -88,6 +88,76 @@ router.get('/users', AuthenticationFunctions.ensureAuthenticated, Authentication
     });
 });
 
+router.get('/analytics', AuthenticationFunctions.ensureAuthenticated, AuthenticationFunctions.ensureAdmin, (req, res) => {
+    let con = mysql.createConnection(dbInfo);
+    con.query(`SELECT * FROM listings;`, (findListingsError, listings, fields) => {
+        if (findListingsError) {
+            con.end();
+            req.flash('error', 'Error.');
+            return res.redirect('/dashboard');
+        }
+
+        averagePrice = 0
+        listedItemsCount = 0
+        itemsSold = 0
+        totalRevenue = 0
+        cancelledTransactions = 0
+        pendingTransactions = 0
+
+        allListingsCount = listings.length
+
+        for (i in listings) {
+            averagePrice += listings[i].price
+            if (listings[i].status == 0) {
+                listedItemsCount += 1
+            } else if (listings[i].status == 1) {
+                itemsSold += 1
+                totalRevenue += listings[i].price
+            } else if (listings[i].status == 3) {
+                cancelledTransactions += 1
+            } else if (listings[i].status == 4) {
+                pendingTransactions += 1
+            }
+        }
+        averagePrice /= allListingsCount
+        averagePrice = averagePrice.toFixed(2)
+        cancelledTransactions *= 10
+
+        con.query(`SELECT * FROM transactions;`, (findTransactionsError, transactions, fields) => {
+            if (findTransactionsError) {
+                con.end();
+                req.flash('error', 'Error.');
+                return res.redirect('/dashboard');
+            }
+
+            con.query(`SELECT * FROM disputes;`, (findDisputesError, disputes, fields) => {
+                if (findDisputesError) {
+                    con.end();
+                    req.flash('error', 'Error.');
+                    return res.redirect('/dashboard');
+                }
+
+                numDisputes = disputes.length
+                disputeRatio = numDisputes * 10 / transactions.length
+
+                con.end();
+                return res.render('platform/admin/analytics.hbs', {
+                    error: req.flash('error'),
+                    success: req.flash('success'),
+                    page_name: 'Analytics',
+                    averagePrice: averagePrice,
+                    listedItemsCount: listedItemsCount,
+                    itemsSold: itemsSold,
+                    totalRevenue: totalRevenue,
+                    cancelledTransactions: cancelledTransactions,
+                    pendingTransactions: pendingTransactions,
+                    disputeRatio: disputeRatio
+                });
+            });
+        });
+    });
+});
+
 router.get('/view-user/:user_id', AuthenticationFunctions.ensureAuthenticated, AuthenticationFunctions.ensureAdmin, (req, res) => {
     let con = mysql.createConnection(dbInfo);
     con.query(`SELECT * FROM users WHERE id=${mysql.escape(req.user.id)};`, (findUserError, currentUser, fields) => {
@@ -292,7 +362,20 @@ router.get(`/transactions/view/:id`, AuthenticationFunctions.ensureAuthenticated
   });
 });
 
-
+router.post(`/ban-user/:user_id`, AuthenticationFunctions.ensureAuthenticated, AuthenticationFunctions.ensureAdmin, (req, res) => {
+    let con = mysql.createConnection(dbInfo);
+    con.query(`UPDATE users SET ban=1 WHERE id=${mysql.escape(req.params.user_id)};`, (errorBanningUser, updateUserResult, fields) => {
+        if (errorBanningUser) {
+            console.log(errorBanningUser);
+            con.end();
+            req.flash('error', 'Error banning user.');
+            return res.redirect(`/admin/view-user/${req.params.user_id}`);
+        }
+        con.end();
+        req.flash('success', 'Successfully banned user.');
+        return res.redirect(`/admin/view-user/${req.params.user_id}`);
+    });
+});
 
 
 

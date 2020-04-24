@@ -84,6 +84,7 @@
                             <div class="m-form__actions m-form__actions">
                                 <button type="submit" class="btn btn-primary">Submit</button>
                                 <button type="reset" class="btn btn-secondary">Cancel</button>
+                                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#ban_user_modal">Ban User</button>
                             </div>
                         </div>
                     </form>
@@ -139,6 +140,32 @@
                 <!--end::Portlet-->
             </div>
         </div>
+
+        <!--begin::Modal-->
+        <div class="modal fade" id="ban_user_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-sm" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Ban User</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form action="/admin/ban-user/{{user.id}}" method="POST">
+                        <div class="modal-body">
+                            <p>
+                                Please double check to ensure that this user has broken the guidelines before banning.
+                            </p>
+                        </div>
+                        <div class="modal-footer m-form__actions m-form__actions">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-danger">Ban User</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!--end::Modal-->
 
 		<!--End::Main Portlet-->
 	</div>
