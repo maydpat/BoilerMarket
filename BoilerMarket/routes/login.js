@@ -50,6 +50,10 @@ router.post('/login', AuthenticationFunctions.ensureNotAuthenticated, (req, res)
             con.end();
             req.flash('error', 'Email or Password is incorrect.');
             return res.redirect('/login');
+        } else if (results[0].ban) {
+            con.end();
+            req.flash('error', 'You have been banned from BoilerMarket.');
+            return res.redirect('/login');
         } else {
             if (bcrypt.compareSync(req.body.password, results[0].password)) {
                 con.end();
