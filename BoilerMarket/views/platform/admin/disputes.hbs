@@ -1,0 +1,63 @@
+{{> adminHeader}}
+<div class="m-grid__item m-grid__item--fluid m-wrapper">
+
+	<div class="m-content">
+		{{#if error}}
+		<div class="alert alert-danger alert-dismissible fade show" role="alert">
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+			</button>
+			<strong>Oh snap!</strong> {{error}}
+		</div>
+		{{/if}}
+		{{#if success}}
+		<div class="alert alert-success alert-dismissible fade show" role="alert">
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+			</button>
+			<strong>Success!</strong> {{success}}
+		</div>
+		{{/if}}
+
+		<div class="m-portlet m-portlet--mobile">
+      <div class="m-portlet__head">
+        <div class="m-portlet__head-caption">
+          <div class="m-portlet__head-title">
+            <h3 class="m-portlet__head-text">
+              Disputes
+            </h3>
+          </div>
+        </div>
+      </div>
+      <div class="m-portlet__body">
+        <!--begin: Datatable -->
+        <table class="table table-striped- table-bordered table-hover table-checkable" id="disputes_table">
+          <thead>
+            <tr>
+              <th>Buyer</th>
+              <th>Seller</th>
+              <th>Reason</th>
+              <th>Status</th>
+              <th>Dispute Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each disputes}}
+            <tr>
+              <td><a href="/admin/view-user/{{this.buyer_id}}">{{this.buyer_email}}</a></td>
+              <td><a href="/admin/view-user/{{this.seller_id}}">{{this.seller_email}}</a></td>
+              <td>{{this.dispute_reason}}</td>
+              <td>{{this.dispute_status}}</td>
+              <td>{{this.dispute_date}}</td>
+              <td nowrap>{{this.dispute_id}}</td>
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+		<!--End::Main  Portlet-->
+	</div>
+</div>
+
+{{> adminFooter}}

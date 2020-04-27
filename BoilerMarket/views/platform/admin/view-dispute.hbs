@@ -1,0 +1,118 @@
+{{> adminHeader}}
+<div class="m-grid__item m-grid__item--fluid m-wrapper">
+
+	<div class="m-content">
+		{{#if error}}
+		<div class="alert alert-danger alert-dismissible fade show" role="alert">
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+			</button>
+			<strong>Oh snap!</strong> {{error}}
+		</div>
+		{{/if}}
+		{{#if success}}
+		<div class="alert alert-success alert-dismissible fade show" role="alert">
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+			</button>
+			<strong>Success!</strong> {{success}}
+		</div>
+		{{/if}}
+
+		<div class="row">
+            <div class="col-lg-6">
+
+                <!--begin::Portlet-->
+                <div class="m-portlet">
+                    <div class="m-portlet__head">
+                        <div class="m-portlet__head-caption">
+                            <div class="m-portlet__head-title">
+                                <span class="m-portlet__head-icon m--hide">
+                                    <i class="la la-gear"></i>
+                                </span>
+                                <h3 class="m-portlet__head-text">
+                                    Viewing Dispute
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--begin::Form-->
+                    
+                    <form class="m-form">
+                        <div class="m-portlet__body">
+                            <div class="m-form__section m-form__section--first">
+                                <div class="form-group m-form__group">
+                                    <label for="example_input_full_name">Buyer:</label>
+                                    <b><a target="_blank" href="/admin/view-user/{{dispute.buyer_id}}">{{dispute.buyer_email}}</a></b>
+                                </div>
+                                <div class="form-group m-form__group">
+                                    <label for="example_input_full_name">Seller:</label>
+                                    <b><a target="_blank" href="/admin/view-user/{{dispute.seller_id}}">{{dispute.seller_email}}</a></b>
+                                </div>
+                                <div class="form-group m-form__group">
+                                    <label for="example_input_full_name">Transaction:</label>
+                                    <b><a target="_blank" href="/admin/view-transaction/{{dispute.transaction_id}}">View Transaction</a></b>
+                                </div>
+                                <div class="form-group m-form__group">
+                                    <label for="example_input_full_name">Dispute Reason:</label>
+                                    <input type="text" class="form-control m-input" disabled="" value="{{dispute.dispute_reason}}">
+                                </div>
+                                <div class="form-group m-form__group">
+                                    <label for="example_input_full_name">Dispute Status:</label>
+                                    <input type="text" class="form-control m-input" disabled="" value="{{#disputeStatusHelper dispute.dispute_status}}{{/disputeStatusHelper}}">
+                                </div>
+                                <div class="form-group m-form__group">
+                                    <label for="example_input_full_name">Dispute Date:</label>
+                                    <input type="text" class="form-control m-input" disabled="" value="{{dispute.dispute_date}}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="m-portlet__foot m-portlet__foot--fit">
+                            <div class="m-form__actions m-form__actions">
+                                <a href="/admin/disputes" class="btn btn-primary">Go Back</a>
+                                {{#if showResolveButton}}
+                                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#resolve_dispute_modal">Resolve</button>
+                                {{/if}}
+                            </div>
+                        </div>
+                    </form>
+
+                    <!--end::Form-->
+                </div>
+
+                <!--end::Portlet-->
+            </div>
+        </div>
+
+        <!--begin::Modal-->
+        <div class="modal fade" id="resolve_dispute_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-sm" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Resolve Dispute</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form action="/admin/disputes/resolve" method="POST">
+                        <div class="modal-body">
+                            <div class="form-group m-form__group">
+                                <label for="example_input_full_name">Message:</label>
+                                <input type="text" class="form-control m-input" name="resolved_message" required="" placeholder="Enter a message">
+                                <input type="hidden"  name="dispute_id" value="{{dispute.dispute_id}}">
+                            </div>
+                        </div>
+                        <div class="modal-footer m-form__actions m-form__actions">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-success">Resolve</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!--end::Modal-->
+
+		<!--End::Main Portlet-->
+	</div>
+</div>
+
+{{> adminFooter}}

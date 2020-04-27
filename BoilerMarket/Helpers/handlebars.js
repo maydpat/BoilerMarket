@@ -11,6 +11,13 @@ var register = function(Handlebars) {
         } else {
             return true;
         }
+    },
+    disputeStatusHelper: function(data) {
+        if (Number(data) === 0) {
+            return 'Unresolved'
+        } else {
+            return 'Resolved'
+        }
     }
 };
 
