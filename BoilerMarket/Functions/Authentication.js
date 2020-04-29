@@ -1,6 +1,15 @@
 const request = require('request');
 const _ = require('lodash');
 const handlebars = require('handlebars');
+const nodemailer = require('nodemailer');
+const mysql = require('mysql');
+let transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: "purdueboilermarket@gmail.com",
+      pass: "BoilerMarket1234!"
+    }
+  });
 
 
 module.exports = {

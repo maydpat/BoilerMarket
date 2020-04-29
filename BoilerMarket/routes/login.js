@@ -18,6 +18,7 @@ const nexmo = new Nexmo({
 
 const LocalStrategy = require('passport-local').Strategy;
 const AuthenticationFunctions = require('../Functions/Authentication.js');
+const AppealsFunctions = require('../Functions/Appeals.js');
 
 let dbInfo = {
     connectionLimit: 100,
@@ -52,8 +53,9 @@ router.post('/login', AuthenticationFunctions.ensureNotAuthenticated, (req, res)
             return res.redirect('/login');
         } else if (results[0].ban) {
             con.end();
-            req.flash('error', 'You have been banned from BoilerMarket.');
-            return res.redirect('/login');
+            return res.render('platform/appeal.hbs', {
+                email: (req.body.username).toLowerCase(),
+            });
         } else {
             if (bcrypt.compareSync(req.body.password, results[0].password)) {
                 con.end();
@@ -170,6 +172,57 @@ async function (req, username, password, done) {
     }
       
 }));
+
+router.post('/appeal', AuthenticationFunctions.ensureNotAuthenticated, (req, res) => {
+    let con = mysql.createConnection(dbInfo);
+    con.query(`SELECT * FROM users WHERE email=${mysql.escape(req.body.username)};`, (error, users, fields) => {
+        if (error) {
+            console.log(error);
+            con.end();
+            req.flash('error', 'Error.');
+            return res.redirect('/login');
+        } else {
+            if (users.length === 0) {
+                con.end();
+                req.flash('error', 'Error. User not found.');
+                return res.redirect('/login');
+            } else {
+                if (users[0].ban === 0) {
+                    con.end();
+                    req.flash('error', 'Error.');
+                    return res.redirect('/login');
+                } else {
+                    con.query(`SELECT * FROM appeals WHERE user_id='${users[0].id}';`, (errorFetchingAppeals, appeals, fields) => {
+                        if (errorFetchingAppeals) {
+                            console.log(errorFetchingAppeals);
+                            con.end();
+                            req.flash('error', 'Error.');
+                            return res.redirect('/login');
+                        }
+                        if (appeals.length !== 0) {
+                            con.end();
+                            req.flash('error', 'Error. You have already submitted an appeal. Please wait for it to be reviewed.');
+                            return res.redirect('/login');
+                        } else {
+                            con.query(`INSERT INTO appeals (id, user_id, reason) VALUES ('${uuidv4()}', '${users[0].id}', ${mysql.escape(req.body.appeal_reason)});`, (errorInsertingAppeal, insertResult, fields) => {
+                                if (errorInsertingAppeal) {
+                                    console.log(errorInsertingAppeal);
+                                    con.end();
+                                    req.flash('error', 'Error.');
+                                    return res.redirect('/login');
+                                }
+                                con.end();
+                                req.flash('success', 'Appealed successfully.');
+                                AppealsFunctions.appeal_emailAdmins();
+                                return res.redirect('/login');
+                            });
+                        }
+                    });
+                }
+            }
+        }
+    });
+});
   
 passport.serializeUser(function (uuid, done) {
     done(null, uuid);

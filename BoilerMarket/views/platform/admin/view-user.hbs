@@ -84,7 +84,12 @@
                             <div class="m-form__actions m-form__actions">
                                 <button type="submit" class="btn btn-primary">Submit</button>
                                 <button type="reset" class="btn btn-secondary">Cancel</button>
+                                {{#if showBanButton}}
                                 <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#ban_user_modal">Ban User</button>
+                                {{/if}}
+                                {{#if showUnbanButton}}
+                                <a href="/admin/unban-user/{{user.id}}" class="btn btn-danger">Unban User</a>
+                                {{/if}}
                             </div>
                         </div>
                     </form>

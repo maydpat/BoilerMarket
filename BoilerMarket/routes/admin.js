@@ -124,7 +124,7 @@ router.get('/users', AuthenticationFunctions.ensureAuthenticated, Authentication
         if (findUserError) {
             con.end();
             req.flash('error', 'Error.');
-            return res.redirect('/dashboard');
+            return res.redirect('/admin/dashboard');
         }
         con.query(`SELECT * FROM users;`, (errorGettingUsers, users, fields) => {
             if (errorGettingUsers) {
@@ -156,14 +156,14 @@ router.get('/view-user/:user_id', AuthenticationFunctions.ensureAuthenticated, A
         if (findUserError) {
             con.end();
             req.flash('error', 'Error.');
-            return res.redirect('/dashboard');
+            return res.redirect('/admin/users');
         }
         con.query(`SELECT * FROM users WHERE id=${mysql.escape(req.params.user_id)};`, (errorGettingUsers, user, fields) => {
             if (errorGettingUsers) {
                 console.log(errorGettingUsers);
                 con.end();
                 req.flash('error', 'Error.');
-                return res.redirect('/admin/dashboard');
+                return res.redirect('/admin/users');
             }
             if (user.length === 0) {
                 con.end();
@@ -171,6 +171,8 @@ router.get('/view-user/:user_id', AuthenticationFunctions.ensureAuthenticated, A
                 return res.redirect('/admin/users');
             }
             con.end();
+            showBanButton = user[0].ban === 0;
+            showUnbanButton = user[0].ban === 1;
             return res.render('platform/admin/view-user.hbs', {
                 error: req.flash('error'),
                 success: req.flash('success'),
@@ -182,6 +184,8 @@ router.get('/view-user/:user_id', AuthenticationFunctions.ensureAuthenticated, A
                 user_last_name: currentUser[0].last_name,
                 user_two_factor: currentUser[0].two_factor,
                 user: user[0],
+                showBanButton: showBanButton,
+                showUnbanButton: showUnbanButton,
             });
         });
     });
@@ -251,7 +255,7 @@ router.get('/transactions', AuthenticationFunctions.ensureAuthenticated, Authent
         if (findUserError) {
             con.end();
             req.flash('error', 'Error.');
-            return res.redirect('/dashboard');
+            return res.redirect('/admin/dashboard');
         }
         con.query(`SELECT transactions.id, transactions.status, listings.title, listings.description, listings.price, listings.listing_type, transactions.date, transactions.buyer, transactions.seller FROM transactions JOIN listings ON transactions.listing_id = listings.id;`, (errorGettingTransactions, transactions, fields) => {
             if (errorGettingTransactions) {
@@ -555,7 +559,7 @@ router.get(`/disputes`, AuthenticationFunctions.ensureAuthenticated, Authenticat
         if (findUserError) {
             con.end();
             req.flash('error', 'Error.');
-            return res.redirect('/dashboard');
+            return res.redirect('/admin/dashboard');
         }
         con.query(`SELECT dispute_id, transaction_id, dispute_reason, dispute_status, dispute_date, buyer_id, seller_id, buyer_email, users.email as 'seller_email' FROM (SELECT dispute_id, transaction_id, dispute_reason, dispute_status, dispute_date, buyer_id, seller_id, users.email as 'buyer_email' FROM (SELECT disputes.id as 'dispute_id', disputes.transaction_id, disputes.reason as 'dispute_reason', disputes.status as 'dispute_status', disputes.date as 'dispute_date', transactions.buyer as 'buyer_id', transactions.seller as 'seller_id' FROM disputes JOIN transactions ON disputes.transaction_id = transactions.id) AS T1 JOIN users ON T1.buyer_id = users.id) AS T2 JOIN users ON T2.seller_id = users.id;`, (errorFetchingDisputes, disputes, fields) => {
             if (errorFetchingDisputes) {
@@ -584,7 +588,7 @@ router.get(`/view-dispute/:dispute_id`, AuthenticationFunctions.ensureAuthentica
         if (findUserError) {
             con.end();
             req.flash('error', 'Error.');
-            return res.redirect('/dashboard');
+            return res.redirect('/admin/disputes');
         }
         con.query(`SELECT dispute_id, transaction_id, dispute_reason, dispute_status, dispute_date, buyer_id, seller_id, buyer_email, users.email as 'seller_email' FROM (SELECT dispute_id, transaction_id, dispute_reason, dispute_status, dispute_date, buyer_id, seller_id, users.email as 'buyer_email' FROM (SELECT disputes.id as 'dispute_id', disputes.transaction_id, disputes.reason as 'dispute_reason', disputes.status as 'dispute_status', disputes.date as 'dispute_date', transactions.buyer as 'buyer_id', transactions.seller as 'seller_id' FROM disputes JOIN transactions ON disputes.transaction_id = transactions.id) AS T1 JOIN users ON T1.buyer_id = users.id) AS T2 JOIN users ON T2.seller_id = users.id WHERE dispute_id = ${mysql.escape(req.params.dispute_id)};`, (errorFetchingDispute, dispute, fields) => {
             if (errorFetchingDispute) {
@@ -598,7 +602,7 @@ router.get(`/view-dispute/:dispute_id`, AuthenticationFunctions.ensureAuthentica
                 req.flash('error', 'Error fetching dispute.');
                 return res.redirect('/admin/disputes');
             } else {
-                showResolveButton = dispute[0].dispute_status === 0
+                showResolveButton = dispute[0].dispute_status === 0;
                 return res.render('platform/admin/view-dispute.hbs', {
                     page_name: 'View Dispute',
                     user_first_name: currentUser[0].first_name,
@@ -657,7 +661,7 @@ router.get(`/listings`, AuthenticationFunctions.ensureAuthenticated, Authenticat
         if (findUserError) {
             con.end();
             req.flash('error', 'Error.');
-            return res.redirect('/dashboard');
+            return res.redirect('/admin/dashboard');
         }
         con.query(`SELECT * FROM listings;`, (errorFetchingListings, listings, fields) => {
             if (errorFetchingListings) {
@@ -689,7 +693,7 @@ router.get(`/edit-listing`, AuthenticationFunctions.ensureAuthenticated, Authent
         if (findUserError) {
             con.end();
             req.flash('error', 'Error.');
-            return res.redirect('/dashboard');
+            return res.redirect('/admin/listings');
         }
         con.query(`SELECT * FROM listings WHERE id=${mysql.escape(req.query.listing_id)};`, (errorFetchingListing, listing, fields) => {
             if (errorFetchingListing) {
@@ -830,6 +834,75 @@ router.get(`/delete-listing/:listing_id`, AuthenticationFunctions.ensureAuthenti
       });
     }
   });
+});
+
+router.get('/ban-appeals', AuthenticationFunctions.ensureAuthenticated, AuthenticationFunctions.ensureAdmin, (req, res) => {
+    let con = mysql.createConnection(dbInfo);
+    con.query(`SELECT * FROM users WHERE id=${mysql.escape(req.user.id)};`, (findUserError, users, fields) => {
+        if (findUserError) {
+            con.end();
+            req.flash('error', 'Error.');
+            return res.redirect('/admin/dashboard');
+        }
+        con.query(`SELECT appeals.reason as 'appeal_reason', appeals.date as 'appeal_date', users.email as 'user_email', appeals.user_id FROM appeals JOIN users ON appeals.user_id = users.id;`, (errorFetchingAppeals, appeals, fields) => {
+            if (errorFetchingAppeals) {
+                con.end();
+                console.log(errorFetchingAppeals);
+                req.flash('error', 'Error.');
+                return res.redirect('/admin/dashboard');
+            }
+            con.end();
+            return res.render('platform/admin/ban-appeals.hbs', {
+                error: req.flash('error'),
+                success: req.flash('success'),
+                page_name: 'BoilerMarket Ban Appeals',
+                user_email: users[0].email,
+                user_phone_number: users[0].phone_number,
+                user_location: users[0].location,
+                user_first_name: users[0].first_name,
+                user_last_name: users[0].last_name,
+                user_two_factor: users[0].two_factor,
+                appeals: appeals
+            });
+        });
+    });
+});
+
+router.get('/unban-user/:user_id', AuthenticationFunctions.ensureAuthenticated, AuthenticationFunctions.ensureAdmin, (req, res) => {
+    let con = mysql.createConnection(dbInfo);
+    con.query(`SELECT * FROM users WHERE id=${mysql.escape(req.params.user_id)};`, (errorFetchingUser, user, fields) => {
+        if (errorFetchingUser) {
+            console.log(errorFetchingUser);
+            con.end();
+            req.flash('error', 'Error unbanning user.');
+            return res.redirect(`/admin/view-user/${req.params.user_id}`);
+        }
+        if (user.length === 0) {
+            con.end();
+            req.flash('error', 'User not found.');
+            return res.redirect(`/admin/view-user/${req.params.user_id}`);
+        } else {
+            con.query(`UPDATE users SET ban=0 WHERE id=${mysql.escape(req.params.user_id)};`, (errorUpdatingUser, updateUserResult, fields) => {
+                if (errorUpdatingUser) {
+                    console.log(errorUpdatingUser);
+                    con.end();
+                    req.flash('error', 'Error unbanning user.');
+                    return res.redirect(`/admin/view-user/${req.params.user_id}`);
+                }
+                con.query(`DELETE FROM appeals WHERE user_id=${mysql.escape(req.params.user_id)};`, (deleteAppealsError, deleteAppealsResult, fields) => {
+                    if (deleteAppealsError) {
+                        console.log(deleteAppealsError);
+                        con.end();
+                        req.flash('error', 'Error unbanning user.');
+                        return res.redirect(`/admin/view-user/${req.params.user_id}`);
+                    }
+                    con.end();
+                    req.flash('success', 'Successfully unbanned user.');
+                    return res.redirect(`/admin/view-user/${req.params.user_id}`);
+                });
+            });
+        }
+    });
 });
 
 
