@@ -1,0 +1,55 @@
+{{> adminHeader}}
+<div class="m-grid__item m-grid__item--fluid m-wrapper">
+
+  <div class="m-content">
+      {{#if error}}
+		<div class="alert alert-danger alert-dismissible fade show" role="alert">
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+			</button>
+			<strong>Oh snap!</strong> {{error}}
+		</div>
+		{{/if}}
+		{{#if success}}
+		<div class="alert alert-success alert-dismissible fade show" role="alert">
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+			</button>
+			<strong>Success!</strong> {{success}}
+		</div>
+		{{/if}}
+        <div class="m-portlet">
+            <div class="m-portlet__head">
+                <div class="m-portlet__head-caption">
+                    <div class="m-portlet__head-title">
+                        <h3 class="m-portlet__head-text">
+                            BoilerMarket's Terms of Service
+                        </h3>
+                    </div>
+                </div>
+            </div>
+
+            <!--begin::Form-->
+            <form class="m-form m-form--fit m-form--label-align-right" action="/admin/tos" method="POST">
+                <div class="m-portlet__body">
+                    <div class="form-group m-form__group row">
+                        <div class="col-lg-9 col-md-9 col-sm-12">
+                            <textarea required="" name="tos" id="m_summernote_1" class="summernote">{{settings.tos}}</textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="m-portlet__foot m-portlet__foot--fit">
+                    <div class="m-form__actions m-form__actions">
+                        <div class="row">
+                            <div class="col-lg-9 ml-lg-auto">
+                                <button type="submit" class="btn btn-brand">Submit</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+
+            <!--end::Form-->
+        </div>
+  </div>
+</div>
+
+{{> adminFooter}}

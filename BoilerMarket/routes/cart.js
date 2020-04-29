@@ -109,7 +109,7 @@ router.get(`/cart/add/:id`, AuthenticationFunctions.ensureAuthenticated, (req, r
           }
           con.end();
           req.flash('success', 'Successfully added to your cart.');
-          return res.redirect('/listings');
+          return res.redirect('/cart');
         });
       });
     }

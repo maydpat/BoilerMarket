@@ -30,8 +30,18 @@ let dbInfo = {
 };
 
 router.get('/tos', (AuthenticationFunctions.ensureAuthenticated, (req, res) => {
-    return res.render('platform/tos.hbs', {
-        
+    let con = mysql.createConnection(dbInfo);
+    con.query(`SELECT * FROM settings;`, (fetchError, settings, fields) => {
+        if (fetchError) {
+            con.end();
+            console.log(fetchError);
+            req.flash('error', 'Error.');
+            return res.redirect('/dashboard');
+        }
+        con.end();
+        return res.render('platform/tos.hbs', {
+            settings: settings[0],
+        });
     });
 }));
 

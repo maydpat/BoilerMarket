@@ -20,6 +20,7 @@ const LocalStrategy = require('passport-local').Strategy;
 const AuthenticationFunctions = require('../Functions/Authentication.js');
 const TransactionFunctions = require('../Functions/Transactions.js');
 const DisputeFunctions = require('../Functions/Disputes.js');
+const NotificationsFunctions = require('../Functions/Notifications.js');
 
 let dbInfo = {
     connectionLimit: 100,
@@ -902,6 +903,60 @@ router.get('/unban-user/:user_id', AuthenticationFunctions.ensureAuthenticated, 
                 });
             });
         }
+    });
+});
+
+router.get('/tos', AuthenticationFunctions.ensureAuthenticated, AuthenticationFunctions.ensureAdmin, (req, res) => {
+    let con = mysql.createConnection(dbInfo);
+    con.query(`SELECT * FROM users WHERE id=${mysql.escape(req.user.id)};`, (findUserError, users, fields) => {
+        if (findUserError) {
+            con.end();
+            req.flash('error', 'Error.');
+            return res.redirect('/admin/dashboard');
+        }
+        con.query(`SELECT * FROM settings;`, (fetchSettingsError, settings, fields) => {
+            if (fetchSettingsError) {
+                console.log(fetchSettingsError);
+                con.end();
+                req.flash('error', 'Error.');
+                return res.redirect('/admin/dashboard');
+            }
+            con.end();
+            return res.render('platform/admin/tos.hbs', {
+                error: req.flash('error'),
+                success: req.flash('success'),
+                page_name: 'BoilerMarket Terms of Service',
+                user_email: users[0].email,
+                user_phone_number: users[0].phone_number,
+                user_location: users[0].location,
+                user_first_name: users[0].first_name,
+                user_last_name: users[0].last_name,
+                user_two_factor: users[0].two_factor,
+                settings: settings[0],
+            });
+        });
+    });
+});
+
+router.post('/tos', AuthenticationFunctions.ensureAuthenticated, AuthenticationFunctions.ensureAdmin, (req, res) => {
+    req.checkBody('tos', 'TOS is required.').notEmpty();
+    let formErrors = req.validationErrors();
+    if (formErrors) {
+        req.flash('error', formErrors[0].msg);
+        return res.redirect(`/admin/tos`);
+    }
+    let con = mysql.createConnection(dbInfo);
+    con.query(`UPDATE settings SET tos=${mysql.escape(req.body.tos)};`, (errorUpdatingTOS, tosUpdateResult, fields) => {
+        if (errorUpdatingTOS) {
+            con.end();
+            console.log(errorUpdatingTOS);
+            req.flash('error', 'Error.');
+            return res.redirect('/admin/tos');
+        }
+        con.end();
+        NotificationsFunctions.email_tos_update();
+        req.flash('success', 'Successfully updated TOS.');
+        return res.redirect('/admin/tos');
     });
 });
 

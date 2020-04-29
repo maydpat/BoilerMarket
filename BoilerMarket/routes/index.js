@@ -15,7 +15,7 @@ const LocalStrategy = require('passport-local').Strategy;
 const AuthenticationFunctions = require('../Functions/Authentication.js');
 
 router.get('/', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
-    return res.redirect('/dashboard');
+    return res.redirect('/listings');
 });
 
 

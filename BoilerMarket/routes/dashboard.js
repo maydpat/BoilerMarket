@@ -30,11 +30,7 @@ let dbInfo = {
 };
 
 router.get('/dashboard', AuthenticationFunctions.ensureAuthenticated, (req, res) => {
-    return res.render('platform/dashboard.hbs', {
-      error: req.flash('error'),
-      success: req.flash('success'),
-      user_is_admin: req.user.is_admin,
-    });
+    return res.redirect('/listings');
 });
 
 module.exports = router;
