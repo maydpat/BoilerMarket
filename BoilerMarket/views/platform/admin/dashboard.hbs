@@ -17,9 +17,109 @@
 		</div>
 		{{/if}}
 
-		<div class="row">
-            
-		</div>
+		<!--Begin::Section-->
+						<div class="m-portlet">
+							<div class="m-portlet__body m-portlet__body--no-padding">
+								<div class="row m-row--no-padding m-row--col-separator-xl">
+									<div class="col-md-12 col-lg-12 col-xl-4">
+
+										<!--begin:: Widgets/Stats2-1 -->
+										<div class="m-widget1">
+											<div class="m-widget1__item">
+												<div class="row m-row--no-padding align-items-center">
+													<div class="col">
+														<h3 class="m-widget1__title">Avg Price of Items</h3>
+													</div>
+													<div class="col m--align-right">
+														<span class="m-widget1__number m--font-brand">${{averagePrice}}</span>
+													</div>
+												</div>
+											</div>
+											<div class="m-widget1__item">
+												<div class="row m-row--no-padding align-items-center">
+													<div class="col">
+														<h3 class="m-widget1__title">Items Listed</h3>
+													</div>
+													<div class="col m--align-right">
+														<span class="m-widget1__number m--font-danger">{{listedItemsCount}}</span>
+													</div>
+												</div>
+											</div>
+											<div class="m-widget1__item">
+												<div class="row m-row--no-padding align-items-center">
+													<div class="col">
+														<h3 class="m-widget1__title">Items Sold</h3>
+													</div>
+													<div class="col m--align-right">
+														<span class="m-widget1__number m--font-success">{{itemsSold}}</span>
+													</div>
+												</div>
+											</div>
+										</div>
+
+										<!--end:: Widgets/Stats2-1 -->
+									</div>
+									<div class="col-md-12 col-lg-12 col-xl-4">
+
+										<!--begin:: Widgets/Stats2-2 -->
+										<div class="m-widget1">
+											<div class="m-widget1__item">
+												<div class="row m-row--no-padding align-items-center">
+													<div class="col">
+														<h3 class="m-widget1__title">Total Revenue</h3>
+													</div>
+													<div class="col m--align-right">
+														<span class="m-widget1__number m--font-accent">${{totalRevenue}}</span>
+													</div>
+												</div>
+											</div>
+										</div>
+
+										<!--begin:: Widgets/Stats2-2 -->
+									</div>
+									<div class="col-md-12 col-lg-12 col-xl-3">
+
+										<!--begin:: Widgets/Stats2-3 -->
+										<div class="m-widget1">
+											<div class="m-widget1__item">
+												<div class="row m-row--no-padding align-items-center">
+													<div class="col">
+														<h3 class="m-widget1__title">Pending Transactions</h3>
+													</div>
+													<div class="col m--align-right">
+														<span class="m-widget1__number m--font-success">{{pendingTransactions}}</span>
+													</div>
+												</div>
+											</div>
+											<div class="m-widget1__item">
+												<div class="row m-row--no-padding align-items-center">
+													<div class="col">
+														<h3 class="m-widget1__title">Cancellations per 10 Transactions</h3>
+													</div>
+													<div class="col m--align-right">
+														<span class="m-widget1__number m--font-danger">{{cancelledTransactions}}</span>
+													</div>
+												</div>
+											</div>
+											<div class="m-widget1__item">
+												<div class="row m-row--no-padding align-items-center">
+													<div class="col">
+														<h3 class="m-widget1__title">Disputes per 10 Transactions</h3>
+													</div>
+													<div class="col m--align-right">
+														<span class="m-widget1__number m--font-primary">{{disputeRatio}}</span>
+													</div>
+												</div>
+											</div>
+										</div>
+
+										<!--begin:: Widgets/Stats2-3 -->
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!--End::Section-->
 
 		<!--End::Main  Portlet-->
 	</div>

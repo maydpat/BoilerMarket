@@ -1,0 +1,260 @@
+{{> adminHeader}}
+<div class="m-grid__item m-grid__item--fluid m-wrapper">
+
+	<div class="m-content">
+		{{#if error}}
+		<div class="alert alert-danger alert-dismissible fade show" role="alert">
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+			</button>
+			<strong>Oh snap!</strong> {{error}}
+		</div>
+		{{/if}}
+		{{#if success}}
+		<div class="alert alert-success alert-dismissible fade show" role="alert">
+			<button type="button" class="close" data-dismiss="alert" aria-label="Close">
+			</button>
+			<strong>Success!</strong> {{success}}
+		</div>
+		{{/if}}
+        {{#if showCancelMessage}}
+		<div class="alert alert-danger alert-dismissible fade show" role="alert">
+			<button type="button" data-dismiss="alert">
+			</button>
+			<strong>Oh snap!</strong> {{showCancelMessage}}
+		</div>
+		{{/if}}
+
+		<div class="row">
+            <div class="col-xl-6 col-lg-12">
+
+                <!--begin::Portlet-->
+                <div class="m-portlet">
+                    <div class="m-portlet__head">
+                        <div class="m-portlet__head-caption">
+                            <div class="m-portlet__head-title">
+                                <span class="m-portlet__head-icon m--hide">
+                                    <i class="la la-gear"></i>
+                                </span>
+                                <h3 class="m-portlet__head-text">
+                                    Viewing Transaction
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!--begin::Form-->
+
+                    <form class="m-form">
+                        <div class="m-portlet__body">
+                            <div class="m-form__section m-form__section--first">
+                                <div class="form-group m-form__group">
+                                    <label>Title</label>
+                                    <input type="text" disabled="" class="form-control m-input" value="{{transaction.listing_title}}">
+                                </div>
+                                <div class="form-group m-form__group">
+                                    <label>Description</label>
+                                    <input type="text" disabled="" class="form-control m-input" value="{{transaction.listing_description}}">
+                                </div>
+                                <div class="form-group m-form__group">
+                                    <label>Price</label>
+                                    <input type="number" value="{{transaction.transaction_price}}" disabled="" class="form-control m-input">
+                                </div>
+                                <div class="form-group m-form__group">
+                                    <label for="exampleSelect1">Listing Type</label>
+                                    <select id="listingType" class="form-control m-input" disabled="" name="listing_type" id="exampleSelect1">
+                                        {{#select transaction.listing_type}}
+                                        <option value="1">Sale</option>
+                                        <option value="2">Rent</option>
+                                        {{/select}}
+                                    </select>
+                                </div>
+                                <div id="rentDurationField" class="form-group m-form__group" style="display:none;">
+                                    <label>Rent Duration (Days)</label>
+                                    <input disabled="" id="rentDurationFieldInput" type="number" name="rent_duration" class="form-control m-input" value="{{transaction.rent_duration}}">
+                                </div>
+                                <div class="form-group m-form__group">
+                                    <label>Transaction Date</label>
+                                    <input disabled="" type="text" name="transaction_date" class="form-control m-input" value="{{transaction.transaction_date}}">
+                                </div>
+                                <script>
+                                    function checkFields(){
+                                        if( $('#listingType').val() != '2' ){
+                                            $('#rentDurationField').hide();
+                                        }else{
+                                            $('#rentDurationField').show();
+                                        }
+                                    }
+                                    checkFields();
+                                </script>
+                            </div>
+                        </div>
+                        <div class="m-portlet__foot m-portlet__foot--fit">
+                            <div class="m-form__actions m-form__actions">
+                                <a href="/transactions" class="btn btn-primary">Go Back</a>
+                                {{#if showCancelButton}}
+                                <a href="/admin/transaction/cancel?transaction_id={{transaction.transaction_id}}" class="btn btn-danger">Cancel</a>
+                                {{/if}}
+                                {{#if showDisputeButton}}
+                                <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#dispute_transaction_modal">Dispute</button>
+                                {{/if}}
+                                {{#if showCompleteButton}}
+                                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#complete_transaction_modal">Mark as Complete</button>
+                                {{/if}}
+                            </div>
+                        </div>
+                    </form>
+
+                    <!--end::Form-->
+                </div>
+
+                <!--end::Portlet-->
+            </div>
+
+            <div class="col-xl-6 col-lg-12">
+
+                <!--Begin::Portlet-->
+                <div class="m-portlet  m-portlet--full-height ">
+                    <div class="m-portlet__head">
+                        <div class="m-portlet__head-caption">
+                            <div class="m-portlet__head-title">
+                                <h3 class="m-portlet__head-text">
+                                    Chat
+                                </h3>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="m-portlet__body">
+                        <div class="m-form__section m-form__section--first">
+                            <div class="form-group m-form__group">
+                                <div class="input-group">
+                                    <input type="hidden"  name="buyerID" id="buyerID" value="{{transaction.transaction_buyer}}">
+                                    <input type="hidden"  name="sellerID" id="sellerID" value="{{transaction.transaction_seller}}">
+                                    <input type="hidden"  name="transactionID" id="transactionID" value="{{transaction.transaction_id}}">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="m-scrollable" data-scrollable="true" data-height="380" data-mobile-height="300">
+
+                            <!--Begin::Timeline 2 -->
+                            <div class="m-timeline-2">
+                                <div class="m-timeline-2__items  m--padding-top-25 m--padding-bottom-30" id="messages">
+                                </div>
+                            </div>
+
+                            <!--End::Timeline 2 -->
+                        </div>
+                    </div>
+                </div>
+
+                <!--End::Portlet-->
+            </div>
+
+
+        </div>
+
+        {{#if showDisputeButton}}
+        <!--begin::Modal-->
+        <div class="modal fade" id="dispute_transaction_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-sm" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Open a dispute?</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form action="/admin/transaction/open-dispute" method="POST">
+                        <div class="modal-body">
+                            <p>
+                                If there's a problem that needs to be escalated to BoilerMarket's team, please escalate the transaction into a dispute. <b>Once the transaction has been escalated, it will be irreversible and a final decision will be made by BoilerMarket.</b>
+                            </p>
+                            <div class="form-group">
+                                <label class="form-control-label">Seller Rating:</label>
+                                <input type="number" class="form-control" min="1" max="5" name="seller_rating" required="">
+                                <label class="form-control-label">Dispute Reason:</label>
+                                <input type="text" class="form-control" name="dispute_reason" required="">
+                                <input type="hidden" class="form-control" name="transaction_id" value="{{transaction.transaction_id}}">
+                            </div>
+                        </div>
+                        <div class="modal-footer m-form__actions m-form__actions">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-danger">Escalate</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!--end::Modal-->
+        {{/if}}
+        {{#if showCompleteButton}}
+        <!--begin::Modal-->
+        <div class="modal fade" id="complete_transaction_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-sm" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Transaction Complete?</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <form action="/admin/transaction/complete" method="POST">
+                        <div class="modal-body">
+                            <p>
+                                If the transaction is complete, please rate the seller (1-5) with 1 being the lowest rating and 5 being the highest. <b>Once the transaction is marked as complete, it will be irreversible.</b>
+                            </p>
+                            <div class="form-group">
+                                <label class="form-control-label">Seller Rating:</label>
+                                <input type="number" class="form-control" min="1" max="5" name="seller_rating" required="">
+                                <input type="hidden" class="form-control" name="transaction_id" value="{{transaction.transaction_id}}">
+                            </div>
+                        </div>
+                        <div class="modal-footer m-form__actions m-form__actions">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            <button type="submit" class="btn btn-primary">Mark as Complete</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <!--end::Modal-->
+        {{/if}}
+
+		<!--End::Main Portlet-->
+	</div>
+</div>
+
+<script>
+   var socket = io();
+   function uuidv4() {
+      return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g, c =>
+         (c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> c / 4).toString(16)
+      );
+   }
+    $(() => {
+        getMessages()
+    })
+    socket.on('message', addMessages)
+    //Buyer - <div class="m-timeline-2__item"><span class="m-timeline-2__item-time">Buyer</span><div class="m-timeline-2__item-cricle"><i class="fa fa-genderless m--font-danger"></i></div><div class="m-timeline-2__item-text  m--padding-top-5">HEYHYHEY</div></div>
+    //Seller - <div class="m-timeline-2__item"><span class="m-timeline-2__item-time">Seller</span><div class="m-timeline-2__item-cricle"><i class="fa fa-genderless m--font-success"></i></div><div class="m-timeline-2__item-text  m--padding-top-5">HEYHYHEY</div></div>
+    function addMessages(message){
+        if (message.transaction_id === $("#transactionID").val()) {
+            if (message.sender === $("#buyerID").val()) {
+                $("#messages").append(`<div class="m-timeline-2__item"><span class="m-timeline-2__item-time">Buyer</span><div class="m-timeline-2__item-cricle"><i class="fa fa-genderless m--font-danger"></i></div><div class="m-timeline-2__item-text  m--padding-top-5">${message.content}</div></div>`);
+            } else {
+                $("#messages").append(`<div class="m-timeline-2__item"><span class="m-timeline-2__item-time">Seller</span><div class="m-timeline-2__item-cricle"><i class="fa fa-genderless m--font-success"></i></div><div class="m-timeline-2__item-text  m--padding-top-5">${message.content}</div></div>`);
+            }
+        }
+    }
+    function getMessages(){
+        let sender = $("#buyerID").val();
+        let recipient = $("#sellerID").val();
+        let transID = $("#transactionID").val();
+        //let path = 'http://localhost:80/chat/messages/?currentUser=' + sender + '&transactionID=' + transID + '&recipientUser=' + recipient;
+        let path = 'http://34.68.115.37/chat/messages/?currentUser=' + sender + '&transactionID=' + transID + '&recipientUser=' + recipient;
+      $.get(path, (data) => {
+        data.forEach(addMessages);
+      })
+    }
+
+</script>
+{{> adminFooter}}

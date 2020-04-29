@@ -347,6 +347,10 @@ router.post(`/transactions/open-dispute`, AuthenticationFunctions.ensureAuthenti
           });
         });
       });
+    } else {
+      con.end();
+      req.flash('error', 'Error. Transaction not found.');
+      return res.redirect(`/transactions/view/${req.body.transaction_id}`);
     }
   });
 });
