@@ -75,7 +75,6 @@ router.get('/dashboard', AuthenticationFunctions.ensureAuthenticated, Authentica
             }
             averagePrice /= allListingsCount
             averagePrice = averagePrice.toFixed(2)
-            cancelledTransactions *= 10
     
             con.query(`SELECT * FROM transactions;`, (findTransactionsError, transactions, fields) => {
                 if (findTransactionsError) {
@@ -93,6 +92,9 @@ router.get('/dashboard', AuthenticationFunctions.ensureAuthenticated, Authentica
     
                     numDisputes = disputes.length
                     disputeRatio = numDisputes * 10 / transactions.length
+                    cancelledTransactions = cancelledTransactions * 10 / transactions.length
+                    disputeRatio = disputeRatio.toFixed(2)
+                    cancelledTransactions = cancelledTransactions.toFixed(2)
     
                     con.end();
                     return res.render('platform/admin/dashboard.hbs', {
