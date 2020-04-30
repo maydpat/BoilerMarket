@@ -51,14 +51,14 @@ router.post('/login', AuthenticationFunctions.ensureNotAuthenticated, (req, res)
             con.end();
             req.flash('error', 'Email or Password is incorrect.');
             return res.redirect('/login');
-        } else if (results[0].ban) {
-            con.end();
-            return res.render('platform/appeal.hbs', {
-                email: (req.body.username).toLowerCase(),
-            });
         } else {
             if (bcrypt.compareSync(req.body.password, results[0].password)) {
                 con.end();
+                if (results[0].ban) {
+                    return res.render('platform/appeal.hbs', {
+                        email: (req.body.username).toLowerCase(),
+                    });
+                }
                 if (enable2FA === 1 && results[0].two_factor === 1) {
                     nexmo.verify.request({
                         number: results[0].phone_number,

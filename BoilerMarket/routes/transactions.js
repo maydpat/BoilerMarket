@@ -15,6 +15,7 @@ var request = require("request");
 const mysql = require('mysql');
 const moment = require('moment');
 const nodemailer = require('nodemailer');
+const cron = require("node-cron");
 
 const LocalStrategy = require('passport-local').Strategy;
 const AuthenticationFunctions = require('../Functions/Authentication.js');
@@ -281,6 +282,7 @@ router.post(`/transactions/complete`, AuthenticationFunctions.ensureAuthenticate
             req.flash('error', 'Error updating listing.');
             return res.redirect('/transactions');
           }
+          TransactionFunctions.set_complete_date_for_transaction(req.body.transaction_id);
           TransactionFunctions.email_completeTransaction(transaction[0].buyer, listing[0].title);
           TransactionFunctions.email_completeTransaction(transaction[0].seller, listing[0].title);
           req.flash(`success`, `Transaction completed.`)
@@ -353,6 +355,15 @@ router.post(`/transactions/open-dispute`, AuthenticationFunctions.ensureAuthenti
       return res.redirect(`/transactions/view/${req.body.transaction_id}`);
     }
   });
+});
+
+
+cron.schedule("* * 1 * * *", function() {
+  console.log("---------------------");
+  console.log("Running Cron Job");
+  TransactionFunctions.check_rental_periods();
+  console.log("---------------------");
+  
 });
 
 module.exports = router;
